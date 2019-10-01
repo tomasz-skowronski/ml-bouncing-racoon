@@ -1,0 +1,50 @@
+server:
+  port: 8107
+
+spring:
+  application:
+    name: bouncing-racoon
+  main:
+    banner-mode: "off"
+  profiles:
+    active: dev
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${db.host:localhost}:${db.port:65432}/${db.name:racoon}?ssl=${db.ssl:false}&sslfactory=org.postgresql.ssl.NonValidatingFactory
+    username: ${db.user:racoon}
+    password: ${db.password:changeme}
+  flyway:
+    table: schema_version
+    locations: classpath:db/migrations
+    baseline-on-migrate: true
+  rabbitmq:
+    host:         ${rabbitmq.host:localhost}
+    username:     ${rabbitmq.username:testuser}
+    password:     ${rabbitmq.password:pass}
+    virtual-host: ${rabbitmq.vhost:/magicline}
+    dynamic:      true
+
+app:
+  text-message-api:
+    url: ${text.message.api.url:localhost:9107}
+    username: ${text.message.api.username:MGLtzDY01}
+    password: ${text.message.api.password:Lv6lTia0}
+
+  external-api:
+    url: ${external.api.url:https://external.dev.magicline.com/textmessage}
+    secret: ${external.api.secret:DFJTZh0wSi1x0nvTnZ39Jyk2UXV9R5HJoUIQjCPmj3aZCgljnhyoRzRRryaD980I}
+
+  job:
+    delay:
+      reorder: ${job.delay.reorder:60000} # ms, 1min
+      update: ${job.delay.update:60000} # ms, 1min
+      sync: ${job.delay.sync:60000} # ms, 1min
+logging:
+  config:
+    "classpath:log4j2.xml"
+  level:
+    de.magicline.racoon.service.idm.IdmClient: ${logging.feign.level:DEBUG}
+  endpoint:
+    execution: ${logging.endpoint.time:true}
+  jobs:
+    execution: ${logging.jobs.time:true}

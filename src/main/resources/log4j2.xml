@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration status="WARN">
+    <Appenders>
+        <Socket name="Gelf" protocol="udp" host="${env:GRAYLOG_HOST:-127.0.0.1}" port="12222"
+                connectTimeoutMillis="5000">
+            <GelfLayout host="${sys:ml.host:-unknown}" compressionType="GZIP" compressionThreshold="0">
+                <KeyValuePair key="application" value="ml-text-weasel"/>
+                <KeyValuePair key="container_name" value="${env:ML_APP_NAME:-unknown}"/>
+            </GelfLayout>
+        </Socket>
+
+        <Async name="AsyncGelf">
+            <AppenderRef ref="Gelf"/>
+        </Async>
+
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSSZ} %highlight{%5level (%C#%M\:%L) - %m%n}"/>
+        </Console>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="org.springframework.aop.framework.CglibAopProxy" level="warn"/>
+        <Logger name="feign" level="debug"/>
+        <Root level="warn">
+            <AppenderRef ref="AsyncGelf"/>
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</Configuration>
