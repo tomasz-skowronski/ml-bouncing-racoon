@@ -2,15 +2,46 @@
 
 ![](logo.png)
 
-## Bounced Emails
+## Introduction
 
 http://docs.aws.amazon.com/ses/latest/DeveloperGuide/best-practices-bounces-complaints.html
 
-## API
+## Local development
 
-Callback `GET /?taskid=<taskId>`
+You start the main containers with the following command:
 
-## 3rd-party API
+`(cd ~/src/ml-bouncing-racoon/docker && docker-compose -f docker-compose-run.yaml up -d)`
+
+Then you can start RacoonApplication from the IDE.
+Alternatively you can use the following command all Docker containers:
+
+`(cd ~/src/ml-bouncing-racoon/docker && docker-compose -f docker-compose-run-all.yaml up -d)`
+
+## Database
+
+Access to the DEV and Stage database is via the Jump Server:
+
+`ssh ubuntu@jump.internal.magicline.com`
+
+**DEV**
+
+`PGPASSWORD=igA6gAfQDzzTYZWmydkKptJy psql -h ml-db-bouncingracoon.cwwu8vfqevzy.eu-west-1.rds.amazonaws.com -U racoon_dev`
+
+**Stage**
+
+`PGPASSWORD=eVsxshroerc9UJVFAsfBCVDU psql -h ml-db-bouncingracoon.cwwu8vfqevzy.eu-west-1.rds.amazonaws.com -U racoon_stage`
+
+## Communication
+
+RTEV callbacks `GET /?taskid=<taskId>`
+
+### Swagger
+* [LOCAL](http://localhost:8107/swagger-ui.html)
+* [DEV](https://bouncing-racoon.dev.magicline.com/swagger-ui.html)
+* [STAGE](https://bouncing-racoon.stage.magicline.com/swagger-ui.html)
+* [PROD](https://bouncing-racoon.magicline.com/swagger-ui.html)
+
+## External communication
 
 ### Real-Time Email Validation API
 

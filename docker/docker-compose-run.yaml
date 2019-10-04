@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  postgres:
+    ports:
+      - "65432:5432"
+    restart: always
+    image: postgres:9.6-alpine
+    volumes:
+          - "./init.sql:/docker-entrypoint-initdb.d/init.sql"
+#  rabbitmq:
+#    image: "rabbitmq:3.6.12"
+#    ports:
+#      - "5672:5672"
+#    environment:
+#      RABBITMQ_DEFAULT_USER: testuser
+#      RABBITMQ_DEFAULT_PASS: pass
+#      RABBITMQ_DEFAULT_VHOST: /magicline
+#  text-mock:
+#    image: quay.io/sportalliance/text-message-mock-api:latest
+#    ports:
+#          - "2525:2525"
+#          - "9107:9107"

@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  postgres:
+    image: postgres:9.6-alpine
+    ports:
+      - "65432:5432"
+    restart: always
+    volumes:
+          - "./init.sql:/docker-entrypoint-initdb.d/init.sql"
+#  rabbitmq:
+#    image: "rabbitmq:3.6.12"
+#    ports:
+#      - "5672:5672"
+#    environment:
+#      RABBITMQ_DEFAULT_USER: testuser
+#      RABBITMQ_DEFAULT_PASS: pass
+#      RABBITMQ_DEFAULT_VHOST: /magicline
+  maven:
+    image: quay.io/sportalliance/ml-maven-builder:adoptopenjdk-jdk1101u13
+    environment:
+        - MAVEN_USER=tc_magicline
+        - MAVEN_PASSWORD=sSWqHT7nrBqscWtH
+        - ML_ENVIRONMENT=local
+        - DB_HOST=postgres
+        - DB_PORT=5432
+        - DB_NAME=racoon
+        - DB_USER=racoon
+        - DB_PASSWORD=changeme
+        - DB_SSL=false
+        - RABBITMQ_HOST=rabbitmq
+        - RABBITMQ_VHOST=/magicline
+        - RABBITMQ_USERNAME=testuser
+        - RABBITMQ_PASSWORD=pass
+    links:
+        - postgres
+    volumes:
+        - ".:/app"
+        - "~/.m2/repository:/root/.m2/repository"
+    working_dir: /app
+    command: ["mvn", "-e","-B", "clean", "install","-Dml.log.dir=/tmp" ]

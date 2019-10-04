@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  postgres:
+    ports:
+      - "65432:5432"
+    restart: always
+    image: postgres:9.6-alpine
+    volumes:
+          - "./init.sql:/docker-entrypoint-initdb.d/init.sql"
+#  rabbitmq:
+#    image: "rabbitmq:3.6.12"
+#    ports:
+#      - "5672:5672"
+#    environment:
+#      RABBITMQ_DEFAULT_USER: testuser
+#      RABBITMQ_DEFAULT_PASS: pass
+#      RABBITMQ_DEFAULT_VHOST: /magicline
+  ml-bouncing-racoon:
+    build: ..
+    environment:
+          - ML_ENVIRONMENT=local
+          - DB_HOST=postgres
+          - DB_PORT=5432
+          - DB_NAME=racoon
+          - DB_USER=racoon
+          - DB_PASSWORD=changeme
+          - DB_SSL=false
+          - WAIT_PERIOD=5
+          - TEXT_MESSAGE_API_URL=http://text-mock:9107
+          - RABBITMQ_HOST=rabbitmq
+          - RABBITMQ_VHOST=/magicline
+          - RABBITMQ_USERNAME=testuser
+          - RABBITMQ_PASSWORD=pass
+    depends_on:
+      - postgres
+    ports:
+      - "8107:8107"
+#  text-mock:
+#    image: quay.io/sportalliance/text-message-mock-api
+#    ports:
+#          - "2525:2525"
+#          - "9107:9107"

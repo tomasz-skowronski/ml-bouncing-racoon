@@ -4,7 +4,7 @@
         <Socket name="Gelf" protocol="udp" host="${env:GRAYLOG_HOST:-127.0.0.1}" port="12222"
                 connectTimeoutMillis="5000">
             <GelfLayout host="${sys:ml.host:-unknown}" compressionType="GZIP" compressionThreshold="0">
-                <KeyValuePair key="application" value="ml-text-weasel"/>
+                <KeyValuePair key="application" value="ml-bouncing-racoon"/>
                 <KeyValuePair key="container_name" value="${env:ML_APP_NAME:-unknown}"/>
             </GelfLayout>
         </Socket>
