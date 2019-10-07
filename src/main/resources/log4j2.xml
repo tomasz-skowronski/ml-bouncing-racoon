@@ -21,7 +21,7 @@
     <Loggers>
         <Logger name="org.springframework.aop.framework.CglibAopProxy" level="warn"/>
         <Logger name="feign" level="debug"/>
-        <Root level="warn">
+        <Root level="info">
             <AppenderRef ref="AsyncGelf"/>
             <AppenderRef ref="Console"/>
         </Root>

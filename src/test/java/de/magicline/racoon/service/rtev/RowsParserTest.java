@@ -1,5 +1,7 @@
 package de.magicline.racoon.service.rtev;
 
+import de.magicline.racoon.service.taskresult.RowValue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -11,6 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
+
 
 @ExtendWith(MockitoExtension.class)
 class RowsParserTest {
@@ -27,9 +31,11 @@ class RowsParserTest {
 
         List<RowValue> result = testee.parse(data);
 
-        assertThat(result).containsExactly(
-                new RowValue("a@a.pl", 410, "Address Rejected"),
-                new RowValue("info@magicline.de", 200, "OK - Valid Address"));
+        assertThat(result)
+                .extracting(RowValue::getEmail, RowValue::getResult, RowValue::getMessage)
+                .containsExactly(
+                        tuple("a@a.pl", 410, "Address Rejected"),
+                        tuple("info@magicline.de", 200, "OK - Valid Address"));
     }
 
 }

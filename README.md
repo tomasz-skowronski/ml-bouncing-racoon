@@ -8,12 +8,12 @@ http://docs.aws.amazon.com/ses/latest/DeveloperGuide/best-practices-bounces-comp
 
 ## Local development
 
-You start the main containers with the following command:
+You can start the required Docker containers with the following command:
 
-`(cd ~/src/ml-bouncing-racoon/docker && docker-compose -f docker-compose-run.yaml up -d)`
+`(cd ~/src/ml-bouncing-racoon/docker && docker-compose up -d)`
 
 Then you can start RacoonApplication from the IDE.
-Alternatively you can use the following command all Docker containers:
+Alternatively you can use the following command to run all containers:
 
 `(cd ~/src/ml-bouncing-racoon/docker && docker-compose -f docker-compose-run-all.yaml up -d)`
 
@@ -23,13 +23,10 @@ Access to the DEV and Stage database is via the Jump Server:
 
 `ssh ubuntu@jump.internal.magicline.com`
 
-**DEV**
-
-`PGPASSWORD=igA6gAfQDzzTYZWmydkKptJy psql -h ml-db-bouncingracoon.cwwu8vfqevzy.eu-west-1.rds.amazonaws.com -U racoon_dev`
-
-**Stage**
-
-`PGPASSWORD=eVsxshroerc9UJVFAsfBCVDU psql -h ml-db-bouncingracoon.cwwu8vfqevzy.eu-west-1.rds.amazonaws.com -U racoon_stage`
+| environment | pgpassword |
+|----------|:-------------:|
+| DEV | `PGPASSWORD=igA6gAfQDzzTYZWmydkKptJy psql -h ml-db-bouncingracoon.cwwu8vfqevzy.eu-west-1.rds.amazonaws.com -U racoon_dev` |
+| STAGE | `PGPASSWORD=eVsxshroerc9UJVFAsfBCVDU psql -h ml-db-bouncingracoon.cwwu8vfqevzy.eu-west-1.rds.amazonaws.com -U racoon_stage` |
 
 ## Communication
 
@@ -47,9 +44,19 @@ RTEV callbacks `GET /?taskid=<taskId>`
 
 https://www.email-validator.net/api.html
 
-> During the entire process, we never send any email to the recipient address.
+#### Limits
 
-A multi-layer checking process:
+* Up to 100K email addresses for validation with a single API request.
+* All validation task data will be automatically deleted 14 days after the data has been made available. 
+
+> IMPORTANT: Email addresses marked with `OK - Catch-All Active` 
+can still bounce as some mail servers accept mail for any address and create a non-delivery-report later. 
+If you are using an external service like MailChimp to send out your emails and want to be absolutely sure 
+that all email addresses on your list really exist and are deliverable, 
+we strongly recommend that you use only addresses with a `OK - Valid Address` (200) status.
+
+#### A multi-layer checking process
+
 * Syntax verification (IETF/RFC standard conformance)
 * DNS validation, including MX record lookup
 * Disposable email address detection
@@ -59,6 +66,8 @@ A multi-layer checking process:
 * Mailbox existence checking
 * Catch-All testing
 * Greylisting detection
+
+> During the entire process, we never send any email to the recipient address.
 
 #### Asynchronous Bulk API
 
@@ -77,9 +86,11 @@ and the taskid of your validation task.
 request to the NotifyURL (with a 'taskid' parameter in the URL).
 
 3. The validation results can be downloaded as CSV file using this URL:
+
 `https://www.email-validator.net/download?id=<taskid>&cmd=download`
 
 You can specify the output with these additional parameters:
+
 ```
 - validaddresses-nocatchall (valid addresses, without catchall addresses)
 - catchalladdresses (catchall addresses)
@@ -91,8 +102,10 @@ You can specify the output with these additional parameters:
 
 To get the list of all valid addresses (including the catchall
 addresses) for a validation task, you can use this URL:
+
 `https://www.email-validator.net/download?id=<taskid>&cmd=download&validaddresses-nocatchall&catchalladdresses`
 
 To get the list of invalid addresses for a validation task,
 you can use this URL:
+
 `https://www.email-validator.net/download?id=<taskid>&cmd=download&invalidaddresses`

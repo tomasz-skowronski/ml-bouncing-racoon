@@ -1,18 +1,20 @@
 package de.magicline.racoon.service.rtev;
 
+import de.magicline.racoon.service.taskresult.RowValue;
+
 import java.beans.ConstructorProperties;
 import java.util.Objects;
 
 import com.google.common.base.MoreObjects;
 
-public class RowValue {
+public final class RTEVRowValue implements RowValue {
 
     private final String email;
     private final int result;
     private final String message;
 
     @ConstructorProperties({"email", "result", "message"})
-    public RowValue(String email, int result, String message) {
+    public RTEVRowValue(String email, int result, String message) {
         this.email = email;
         this.result = result;
         this.message = message;
@@ -27,14 +29,17 @@ public class RowValue {
                 .toString();
     }
 
+    @Override
     public String getEmail() {
         return email;
     }
 
+    @Override
     public int getResult() {
         return result;
     }
 
+    @Override
     public String getMessage() {
         return message;
     }
@@ -43,14 +48,13 @@ public class RowValue {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RowValue rowDto = (RowValue) o;
+        RTEVRowValue rowDto = (RTEVRowValue) o;
         return Objects.equals(result, rowDto.result) &&
-                Objects.equals(email, rowDto.email) &&
-                Objects.equals(message, rowDto.message);
+                Objects.equals(email, rowDto.email);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(email, result, message);
+        return Objects.hash(email, result);
     }
 }
