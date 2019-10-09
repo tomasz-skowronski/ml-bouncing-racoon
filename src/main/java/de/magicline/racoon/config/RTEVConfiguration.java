@@ -17,9 +17,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RTEVConfiguration {
 
-    static final String URI_ONE = "https://api.email-validator.net";
-    static final String URI_ASYNC = "https://bulk.email-validator.net";
-    static final String URI_DOWNLOAD = "https://www.email-validator.net";
+    public static final String URI_ONE = "https://api.email-validator.net";
+    public static final String URI_ASYNC = "https://bulk.email-validator.net";
+    public static final String URI_DOWNLOAD = "https://www.email-validator.net";
 
     private final URI uriOne;
     private final URI uriAsync;

@@ -73,7 +73,6 @@ public class EmailValidationService {
     }
 
     /**
-     *
      * @param taskId
      * @return CSV from https://www.email-validator.net/download.html
      */

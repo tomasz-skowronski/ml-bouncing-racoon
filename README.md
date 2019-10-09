@@ -23,14 +23,14 @@ Access to the DEV and Stage database is via the Jump Server:
 
 `ssh ubuntu@jump.internal.magicline.com`
 
-| environment | pgpassword |
-|----------|:-------------:|
-| DEV | `PGPASSWORD=igA6gAfQDzzTYZWmydkKptJy psql -h ml-db-bouncingracoon.cwwu8vfqevzy.eu-west-1.rds.amazonaws.com -U racoon_dev` |
+| env   | pgpassword |
+|-------|:-------------:|
+| DEV   | `PGPASSWORD=igA6gAfQDzzTYZWmydkKptJy psql -h ml-db-bouncingracoon.cwwu8vfqevzy.eu-west-1.rds.amazonaws.com -U racoon_dev` |
 | STAGE | `PGPASSWORD=eVsxshroerc9UJVFAsfBCVDU psql -h ml-db-bouncingracoon.cwwu8vfqevzy.eu-west-1.rds.amazonaws.com -U racoon_stage` |
 
 ## Communication
 
-RTEV callbacks `GET /?taskid=<taskId>`
+RTEV callbacks `GET /racoon/tasks/callbacks?taskid=<taskId>`
 
 ### Swagger
 * [LOCAL](http://localhost:8107/swagger-ui.html)

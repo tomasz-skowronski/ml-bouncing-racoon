@@ -64,8 +64,7 @@ class EmailValidationServiceTest {
         @Test
         void givenNull() throws JsonProcessingException {
             server.stubFor(post("/api/verify").willReturn(ok()
-                            .withBody(json(new RTEVResult(ValidationStatus.INVALID_BAD_ADDRESS)))
-//                .proxiedFrom(RTVE_URL_1)
+                    .withBody(json(new RTEVResult(ValidationStatus.INVALID_BAD_ADDRESS)))
             ));
 
             assertThatThrownBy(() -> service.validateEmail(new ValidateEmailRequest(null)))
@@ -81,8 +80,8 @@ class EmailValidationServiceTest {
             String email = "a@a.pl";
             ValidateEmailRequest request = new ValidateEmailRequest(email);
             server.stubFor(post("/api/verify").willReturn(ok()
-                            .withBody(json(new RTEVResult(ValidationStatus.INVALID_ADDRESS_REJECTED)))
-//                .proxiedFrom(RTVE_URL_1)
+                    .withBody(json(new RTEVResult(ValidationStatus.INVALID_ADDRESS_REJECTED)))
+//                    .proxiedFrom(RTEVConfiguration.URI_ONE)
             ));
 
             service.validateEmail(request);
@@ -103,8 +102,8 @@ class EmailValidationServiceTest {
         ValidateEmailsRequest request = new ValidateEmailsRequest(emails);
         RTEVAsyncResult resposne = new RTEVAsyncResult(ValidationStatus.TASK_ACCEPTED.getCode(), taskId);
         server.stubFor(post("/api/verify").willReturn(ok()
-                        .withBody(json(resposne))
-//                .proxiedFrom(RTVE_URL_2)
+                .withBody(json(resposne))
+//                .proxiedFrom(RTEVConfiguration.URI_ASYNC)
         ));
 
         service.validateEmailsAsync(request);
@@ -128,9 +127,9 @@ class EmailValidationServiceTest {
         void completed() {
             String taskId = "x5-2a6a7d199cc47698f6b8d1cc4995d71d";
             server.stubFor(post("/download.html").willReturn(ok()
-                            .withBody(taskReport)
-                            .withHeader(CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
-//                .proxiedFrom(RTVE_URL_3)
+                    .withBody(taskReport)
+                    .withHeader(CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+//                    .proxiedFrom(RTEVConfiguration.URI_DOWNLOAD)
             ));
 
             TaskResult report = service.downloadTaskResult(taskId);
@@ -147,9 +146,9 @@ class EmailValidationServiceTest {
         void notCompleted() {
             String taskId = "invalid-or-not-completed-task-id";
             server.stubFor(post("/download.html").willReturn(ok()
-                            .withBody("<!DOCTYPE html><html lang=\"en\"><head></head><body></body>")
-                            .withHeader(CONTENT_TYPE, MediaType.TEXT_HTML_VALUE)
-//                .proxiedFrom(RTVE_URL_3)
+                    .withBody("<!DOCTYPE html><html lang=\"en\"><head></head><body></body>")
+                    .withHeader(CONTENT_TYPE, MediaType.TEXT_HTML_VALUE)
+//                    .proxiedFrom(RTEVConfiguration.URI_DOWNLOAD)
             ));
 
             assertThatThrownBy(() -> service.downloadTaskResult(taskId))
