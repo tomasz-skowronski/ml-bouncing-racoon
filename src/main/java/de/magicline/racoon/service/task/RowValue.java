@@ -1,4 +1,4 @@
-package de.magicline.racoon.service.taskresult;
+package de.magicline.racoon.service.task;
 
 public interface RowValue {
 

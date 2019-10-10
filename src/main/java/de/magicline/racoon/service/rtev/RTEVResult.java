@@ -1,6 +1,6 @@
 package de.magicline.racoon.service.rtev;
 
-import de.magicline.racoon.service.taskresult.ValidationStatus;
+import de.magicline.racoon.service.task.ValidationStatus;
 
 import java.beans.ConstructorProperties;
 

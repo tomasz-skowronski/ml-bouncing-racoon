@@ -1,7 +1,6 @@
 package de.magicline.racoon.api;
 
 import de.magicline.racoon.api.dto.ErrorResponse;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,12 +24,23 @@ public class CustomGlobalExceptionHandler {
                 .body(new ErrorResponse(e));
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+        LOGGER.warn("", e);
+        return toResponse(e, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         LOGGER.error("", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage()));
+        return toResponse(e, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    private ResponseEntity<ErrorResponse> toResponse(Exception e, HttpStatus internalServerError) {
+        return ResponseEntity.status(internalServerError)
+                .body(new ErrorResponse(internalServerError.value(), e.getMessage()));
     }
 
 }

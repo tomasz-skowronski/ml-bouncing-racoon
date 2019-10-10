@@ -2,7 +2,6 @@ package de.magicline.racoon.config;
 
 import de.magicline.racoon.service.rtev.RTEVValidationClient;
 import feign.Feign;
-import feign.Request;
 import feign.Retryer;
 import feign.form.FormEncoder;
 import feign.jackson.JacksonDecoder;
@@ -47,7 +46,6 @@ public class RTEVConfiguration {
                 .encoder(new FormEncoder())
                 .decoder(new JacksonDecoder())
                 .retryer(Retryer.NEVER_RETRY)
-                .options(new Request.Options(10000, 60000, false))
                 .logger(new Slf4jLogger())
                 .logLevel(feign.Logger.Level.FULL)
                 .target(RTEVValidationClient.class, "ignore it");

@@ -3,8 +3,8 @@ package de.magicline.racoon.service.rtev;
 import de.magicline.racoon.api.dto.ValidateEmailRequest;
 import de.magicline.racoon.api.dto.ValidateEmailsRequest;
 import de.magicline.racoon.config.RTEVConfiguration;
-import de.magicline.racoon.service.taskresult.TaskResult;
-import de.magicline.racoon.service.taskresult.ValidationStatus;
+import de.magicline.racoon.service.task.TaskResult;
+import de.magicline.racoon.service.task.ValidationStatus;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 import ru.lanwen.wiremock.ext.WiremockUriResolver;
 
@@ -51,7 +51,7 @@ class EmailValidationServiceTest {
 //                RTEVConfiguration.URI_ASYNC,
 //                RTEVConfiguration.URI_DOWNLOAD,
                 "ev-7791b803c271ab303acfa5029b1847e1",
-                "https://raccoon.free.beeceptor.com/"
+                "https://racoon.free.beeceptor.com/"
         );
         RTEVValidationClient validationClient = rtevConfiguration.rtevValidationClient();
         this.service = new EmailValidationService(rtevConfiguration, validationClient, new RowsParser());
@@ -80,7 +80,7 @@ class EmailValidationServiceTest {
             String email = "a@a.pl";
             ValidateEmailRequest request = new ValidateEmailRequest(email);
             server.stubFor(post("/api/verify").willReturn(ok()
-                    .withBody(json(new RTEVResult(ValidationStatus.INVALID_ADDRESS_REJECTED)))
+                            .withBody(json(new RTEVResult(ValidationStatus.INVALID_ADDRESS_REJECTED)))
 //                    .proxiedFrom(RTEVConfiguration.URI_ONE)
             ));
 
@@ -102,7 +102,7 @@ class EmailValidationServiceTest {
         ValidateEmailsRequest request = new ValidateEmailsRequest(emails);
         RTEVAsyncResult resposne = new RTEVAsyncResult(ValidationStatus.TASK_ACCEPTED.getCode(), taskId);
         server.stubFor(post("/api/verify").willReturn(ok()
-                .withBody(json(resposne))
+                        .withBody(json(resposne))
 //                .proxiedFrom(RTEVConfiguration.URI_ASYNC)
         ));
 
@@ -127,8 +127,8 @@ class EmailValidationServiceTest {
         void completed() {
             String taskId = "x5-2a6a7d199cc47698f6b8d1cc4995d71d";
             server.stubFor(post("/download.html").willReturn(ok()
-                    .withBody(taskReport)
-                    .withHeader(CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
+                            .withBody(taskReport)
+                            .withHeader(CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
 //                    .proxiedFrom(RTEVConfiguration.URI_DOWNLOAD)
             ));
 
@@ -146,8 +146,8 @@ class EmailValidationServiceTest {
         void notCompleted() {
             String taskId = "invalid-or-not-completed-task-id";
             server.stubFor(post("/download.html").willReturn(ok()
-                    .withBody("<!DOCTYPE html><html lang=\"en\"><head></head><body></body>")
-                    .withHeader(CONTENT_TYPE, MediaType.TEXT_HTML_VALUE)
+                            .withBody("<!DOCTYPE html><html lang=\"en\"><head></head><body></body>")
+                            .withHeader(CONTENT_TYPE, MediaType.TEXT_HTML_VALUE)
 //                    .proxiedFrom(RTEVConfiguration.URI_DOWNLOAD)
             ));
 

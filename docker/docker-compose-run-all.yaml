@@ -8,14 +8,14 @@ services:
     image: postgres:9.6-alpine
     volumes:
           - "./init.sql:/docker-entrypoint-initdb.d/init.sql"
-#  rabbitmq:
-#    image: "rabbitmq:3.6.12"
-#    ports:
-#      - "5672:5672"
-#    environment:
-#      RABBITMQ_DEFAULT_USER: testuser
-#      RABBITMQ_DEFAULT_PASS: pass
-#      RABBITMQ_DEFAULT_VHOST: /magicline
+  rabbitmq:
+    image: "rabbitmq:3.6.12"
+    ports:
+      - "5672:5672"
+    environment:
+      RABBITMQ_DEFAULT_USER: testuser
+      RABBITMQ_DEFAULT_PASS: pass
+      RABBITMQ_DEFAULT_VHOST: /magicline
   ml-bouncing-racoon:
     build: ..
     environment:

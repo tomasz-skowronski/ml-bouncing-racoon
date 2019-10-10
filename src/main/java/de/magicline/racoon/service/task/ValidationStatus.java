@@ -1,12 +1,14 @@
-package de.magicline.racoon.service.taskresult;
+package de.magicline.racoon.service.task;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.common.base.MoreObjects;
 
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum ValidationStatus {
 
     VALIDATION_DELAYED(Type.INDETERMINATE, 114, true,
@@ -62,23 +64,11 @@ public enum ValidationStatus {
     INVALID_DOMAIN_NAME_MISSPELLED(Type.INVALID, 420, false,
             "The domain name is probably misspelled.");
 
-    private static final Map<Integer, ValidationStatus> MAPPING_BY_ID = Arrays.stream(values())
-            .collect(Collectors.toMap(ValidationStatus::getCode, Function.identity()));
-
-    private Type type;
-
-    public static ValidationStatus of(int result) {
-        return MAPPING_BY_ID.get(result);
-    }
-
-    public Type getType() {
-        return type;
-    }
-
     public enum Type {
         INDETERMINATE, VALID, SUSPECT, INVALID;
     }
 
+    private final Type type;
     private final int code;
     private final boolean retry;
     private final String description;
@@ -88,6 +78,18 @@ public enum ValidationStatus {
         this.code = code;
         this.retry = retry;
         this.description = description;
+    }
+
+    private static final Map<Integer, ValidationStatus> MAPPING_BY_ID = Arrays.stream(values())
+            .collect(Collectors.toMap(ValidationStatus::getCode, Function.identity()));
+
+
+    public static ValidationStatus of(int result) {
+        return MAPPING_BY_ID.get(result);
+    }
+
+    public Type getType() {
+        return type;
     }
 
     public int getCode() {

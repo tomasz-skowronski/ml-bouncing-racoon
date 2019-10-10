@@ -1,8 +1,9 @@
 package de.magicline.racoon.api;
 
 import de.magicline.racoon.service.rtev.EmailValidationService;
-import de.magicline.racoon.service.taskresult.TaskResult;
-import de.magicline.racoon.service.taskresult.TasksCallbacksService;
+import de.magicline.racoon.service.task.TaskCallbacksService;
+import de.magicline.racoon.service.task.TaskResult;
+import de.magicline.racoon.service.task.ValidationStatus;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/racoon/tasks")
 public class TasksController {
 
-    private final TasksCallbacksService tasksCallbacksService;
+    private final TaskCallbacksService tasksCallbacksService;
     private final EmailValidationService emailValidationService;
 
 
-    public TasksController(TasksCallbacksService tasksCallbacksService, EmailValidationService emailValidationService) {
+    public TasksController(TaskCallbacksService tasksCallbacksService, EmailValidationService emailValidationService) {
         this.tasksCallbacksService = tasksCallbacksService;
         this.emailValidationService = emailValidationService;
     }
@@ -33,6 +34,11 @@ public class TasksController {
     @GetMapping("/{taskId}")
     public TaskResult getTaskResult(@PathVariable String taskId) {
         return emailValidationService.downloadTaskResult(taskId);
+    }
+
+    @GetMapping("/statuses/{code}")
+    public ValidationStatus getTaskResult(@PathVariable int code) {
+        return ValidationStatus.of(code);
     }
 
 }

@@ -3,8 +3,8 @@ package de.magicline.racoon.service.rtev;
 import de.magicline.racoon.api.dto.ValidateEmailRequest;
 import de.magicline.racoon.api.dto.ValidateEmailsRequest;
 import de.magicline.racoon.config.RTEVConfiguration;
-import de.magicline.racoon.service.taskresult.TaskResult;
-import de.magicline.racoon.service.taskresult.ValidationStatus;
+import de.magicline.racoon.service.task.TaskResult;
+import de.magicline.racoon.service.task.ValidationStatus;
 import feign.Response;
 
 import java.io.IOException;

@@ -1,6 +1,6 @@
 package de.magicline.racoon.service.rtev;
 
-import de.magicline.racoon.service.taskresult.RowValue;
+import de.magicline.racoon.service.task.RowValue;
 
 import java.beans.ConstructorProperties;
 import java.util.Objects;

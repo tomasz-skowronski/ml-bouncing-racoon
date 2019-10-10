@@ -1,10 +1,11 @@
-package de.magicline.racoon.swagger;
+package de.magicline.racoon.config.swagger;
 
-import com.fasterxml.classmate.TypeResolver;
 import io.swagger.annotations.ApiModel;
 import springfox.documentation.schema.AlternateTypeRule;
 
 import java.time.LocalDateTime;
+
+import com.fasterxml.classmate.TypeResolver;
 
 public class LocalDateTimeTypeRule extends AlternateTypeRule {
     public LocalDateTimeTypeRule(TypeResolver typeResolver) {

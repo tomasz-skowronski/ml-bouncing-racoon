@@ -30,6 +30,31 @@ Access to the DEV and Stage database is via the Jump Server:
 
 ## Communication
 
+```plantuml
+
+actor client
+boundary "ml-external-api"
+actor "email-validator.net (RTEV)" as RTEV
+
+client -> Raccoon : validate e-mails
+Raccoon -> RTEV : POST api/verify
+RTEV -> "ml-external-api" : callback
+"ml-external-api" ->o Raccoon : taskId
+Raccoon -> RTEV : POST /download.html
+Raccoon -> Raccoon : taskResult
+Raccoon ->o client : statusMessage
+...
+Raccoon ->o client : statusMessage
+```
+
+### Mocks
+
+`/src/test/http/mock.http`
+
+### RabbitMQ
+
+### External communication
+
 RTEV callbacks `GET /racoon/tasks/callbacks?taskid=<taskId>`
 
 ### Swagger
@@ -38,8 +63,6 @@ RTEV callbacks `GET /racoon/tasks/callbacks?taskid=<taskId>`
 * [STAGE](https://bouncing-racoon.stage.magicline.com/swagger-ui.html)
 * [PROD](https://bouncing-racoon.magicline.com/swagger-ui.html)
 
-## External communication
-
 ### Real-Time Email Validation API
 
 https://www.email-validator.net/api.html
@@ -47,7 +70,8 @@ https://www.email-validator.net/api.html
 #### Limits
 
 * Up to 100K email addresses for validation with a single API request.
-* All validation task data will be automatically deleted 14 days after the data has been made available. 
+* All validation task data will be automatically deleted 14 days after the data has been made available.
+* The email validator service caches results for several days, so if an email tested as bad, it will continue to show up as bad for a few days until it is re-evaluated. 
 
 > IMPORTANT: Email addresses marked with `OK - Catch-All Active` 
 can still bounce as some mail servers accept mail for any address and create a non-delivery-report later. 

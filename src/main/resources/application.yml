@@ -25,6 +25,13 @@ spring:
     dynamic:      true
 
 app:
+  rtev:
+    notifyURL: http://localhost:8107/racoon/tasks/callbacks
+
+  task:
+    status:
+      batch: 100
+
   text-message-api:
     url: ${text.message.api.url:localhost:9107}
     username: ${text.message.api.username:MGLtzDY01}

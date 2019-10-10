@@ -1,13 +1,13 @@
 package de.magicline.racoon.config;
 
-import com.fasterxml.classmate.TypeResolver;
-import de.magicline.racoon.swagger.LocalDateTimeTypeRule;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import de.magicline.racoon.config.swagger.LocalDateTimeTypeRule;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import org.springframework.context.annotation.Bean;
+
+import com.fasterxml.classmate.TypeResolver;
 
 //@Configuration
 //@EnableSwagger2

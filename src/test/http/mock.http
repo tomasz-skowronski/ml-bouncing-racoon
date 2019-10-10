@@ -1,0 +1,10 @@
+POST http://localhost:8107/racoon/mock/api/verify
+Content-Type: application/x-www-form-urlencoded
+
+EmailAddress=a@a.pl
+a2@a2.pl
+a3@a3.pl
+info@magicline.de
+a@magicline.de
+
+###
