@@ -1,0 +1,11 @@
+POST http://localhost:8107/racoon/validation/async
+Content-Type: application/json
+
+{
+   "emails":[
+      "a@a.pl",
+      "info@magicline.de"
+   ]
+}
+
+###

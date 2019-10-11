@@ -30,8 +30,8 @@ public class RTEVConfiguration {
             @Value("${app.rtev.uri.one:" + URI_ONE + "}") String uriOne,
             @Value("${app.rtev.uri.async:" + URI_ASYNC + "}") String uriAsync,
             @Value("${app.rtev.uri.download:" + URI_DOWNLOAD + "}") String uriDownload,
-            @Value("${app.rtev.apiKey") String apiKey,
-            @Value("${app.rtev.notifyURL") String notifyURL
+            @Value("${app.rtev.apiKey}") String apiKey,
+            @Value("${app.rtev.notifyURL}") String notifyURL
     ) {
         this.uriOne = URI.create(uriOne);
         this.uriAsync = URI.create(uriAsync);

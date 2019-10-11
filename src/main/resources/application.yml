@@ -26,32 +26,13 @@ spring:
 
 app:
   rtev:
+    apiKey: "ev-7791b803c271ab303acfa5029b1847e1"
     notifyURL: http://localhost:8107/racoon/tasks/callbacks
 
   task:
     status:
       batch: 100
 
-  text-message-api:
-    url: ${text.message.api.url:localhost:9107}
-    username: ${text.message.api.username:MGLtzDY01}
-    password: ${text.message.api.password:Lv6lTia0}
-
-  external-api:
-    url: ${external.api.url:https://external.dev.magicline.com/textmessage}
-    secret: ${external.api.secret:DFJTZh0wSi1x0nvTnZ39Jyk2UXV9R5HJoUIQjCPmj3aZCgljnhyoRzRRryaD980I}
-
-  job:
-    delay:
-      reorder: ${job.delay.reorder:60000} # ms, 1min
-      update: ${job.delay.update:60000} # ms, 1min
-      sync: ${job.delay.sync:60000} # ms, 1min
 logging:
   config:
     "classpath:log4j2.xml"
-  level:
-    de.magicline.racoon.service.idm.IdmClient: ${logging.feign.level:DEBUG}
-  endpoint:
-    execution: ${logging.endpoint.time:true}
-  jobs:
-    execution: ${logging.jobs.time:true}

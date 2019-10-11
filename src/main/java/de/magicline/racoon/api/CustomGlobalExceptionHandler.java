@@ -1,11 +1,13 @@
 package de.magicline.racoon.api;
 
 import de.magicline.racoon.api.dto.ErrorResponse;
+import javax.validation.ValidationException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,7 +29,14 @@ public class CustomGlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseBody
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
-        LOGGER.warn("", e);
+        LOGGER.info("", e);
+        return toResponse(e, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ValidationException.class, MethodArgumentNotValidException.class})
+    @ResponseBody
+    public ResponseEntity<ErrorResponse> handleValidationException(Exception e) {
+        LOGGER.info("", e);
         return toResponse(e, HttpStatus.BAD_REQUEST);
     }
 

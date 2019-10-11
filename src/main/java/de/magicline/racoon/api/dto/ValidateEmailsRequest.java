@@ -1,10 +1,13 @@
 package de.magicline.racoon.api.dto;
 
+import javax.validation.constraints.NotNull;
+
 import java.beans.ConstructorProperties;
 import java.util.List;
 
 public class ValidateEmailsRequest {
 
+    @NotNull
     private final List<String> emails;
 
     @ConstructorProperties("emails")

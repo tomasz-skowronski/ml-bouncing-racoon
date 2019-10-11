@@ -30,22 +30,8 @@ Access to the DEV and Stage database is via the Jump Server:
 
 ## Communication
 
-```plantuml
-
-actor client
-boundary "ml-external-api"
-actor "email-validator.net (RTEV)" as RTEV
-
-client -> Raccoon : validate e-mails
-Raccoon -> RTEV : POST api/verify
-RTEV -> "ml-external-api" : callback
-"ml-external-api" ->o Raccoon : taskId
-Raccoon -> RTEV : POST /download.html
-Raccoon -> Raccoon : taskResult
-Raccoon ->o client : statusMessage
-...
-Raccoon ->o client : statusMessage
-```
+![](/doc/sequence.png)
+[](/doc/sequence.plantuml)
 
 ### Mocks
 
