@@ -6,7 +6,7 @@ import java.beans.ConstructorProperties;
 
 import com.google.common.base.MoreObjects;
 
-public class RTEVResult implements StatusAware {
+public class RTEVResult implements RTEVStatusAware {
 
     private final int status;
     private final String info;

@@ -1,5 +1,5 @@
 package de.magicline.racoon.service.rtev;
 
-public interface StatusAware {
+public interface RTEVStatusAware {
     int getStatus();
 }

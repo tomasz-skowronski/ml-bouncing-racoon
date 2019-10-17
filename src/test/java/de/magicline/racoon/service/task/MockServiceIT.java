@@ -4,10 +4,12 @@ import de.magicline.racoon.api.dto.ValidateEmailsRequest;
 import de.magicline.racoon.config.RTEVConfiguration;
 import de.magicline.racoon.service.rtev.EmailValidationService;
 import de.magicline.racoon.service.rtev.RTEVAsyncResult;
+import de.magicline.racoon.service.rtev.DataValidator;
 import de.magicline.racoon.service.rtev.RTEVValidationClient;
 import de.magicline.racoon.service.rtev.RowsParser;
 import de.magicline.racoon.service.status.StatusItem;
 import de.magicline.racoon.service.status.StatusMessage;
+import io.github.resilience4j.retry.RetryConfig;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -33,9 +35,13 @@ class MockServiceIT {
     @BeforeEach
     void setUp() {
         String uri = "http://localhost:" + port + "/racoon/mock";
-        RTEVConfiguration rtevConfiguration = new RTEVConfiguration(uri, uri, uri, "unused", "unused");
+        RTEVConfiguration rtevConfiguration = new RTEVConfiguration(uri, uri, uri, "unused", "unused", 1, 1);
         RTEVValidationClient validationClient = rtevConfiguration.rtevValidationClient();
-        this.testee = new EmailValidationService(rtevConfiguration, validationClient, new RowsParser());
+        this.testee = new EmailValidationService(rtevConfiguration,
+                validationClient,
+                RetryConfig.ofDefaults(),
+                new RowsParser(),
+                new DataValidator());
     }
 
     @Test

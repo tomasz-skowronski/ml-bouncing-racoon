@@ -3,81 +3,67 @@ package de.magicline.racoon.service.rtev;
 import de.magicline.racoon.api.dto.ValidateEmailRequest;
 import de.magicline.racoon.api.dto.ValidateEmailsRequest;
 import de.magicline.racoon.config.RTEVConfiguration;
+import de.magicline.racoon.service.task.RowValue;
 import de.magicline.racoon.service.task.TaskResult;
-import de.magicline.racoon.service.task.ValidationStatus;
 import feign.Response;
+import io.github.resilience4j.retry.Retry;
+import io.github.resilience4j.retry.RetryConfig;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import com.google.common.base.Preconditions;
 
 @Service
 public class EmailValidationService {
 
-    private static final int EMAILS_LIMIT = 100_000;
-    private static final Map<ValidationStatus, HttpStatus> RESPONSE_ERRORS_MAPPING = Map.of(
-            ValidationStatus.INVALID_BAD_ADDRESS, HttpStatus.BAD_REQUEST,
-            ValidationStatus.RATE_LIMIT_EXCEEDED, HttpStatus.TOO_MANY_REQUESTS,
-            ValidationStatus.API_KEY_INVALID_OR_DEPLETED, HttpStatus.FORBIDDEN);
-
     private final RTEVConfiguration rtevConfiguration;
     private final RTEVValidationClient validationClient;
+    private final Retry retry;
     private final RowsParser rowsParser;
+    private final DataValidator dataValidator;
 
-    public EmailValidationService(RTEVConfiguration rtevConfiguration, RTEVValidationClient validationClient, RowsParser rowsParser) {
+    public EmailValidationService(RTEVConfiguration rtevConfiguration, RTEVValidationClient validationClient, RetryConfig retryConfig, RowsParser rowsParser, DataValidator dataValidator) {
         this.rtevConfiguration = rtevConfiguration;
         this.validationClient = validationClient;
+        this.retry = Retry.of("rtev", retryConfig);
         this.rowsParser = rowsParser;
+        this.dataValidator = dataValidator;
     }
 
     public RTEVResult validateEmail(ValidateEmailRequest request) {
-        RTEVResult rtevResponse = validationClient.validateEmail(
+        return retry.executeSupplier(() -> callValidateEmail(request));
+    }
+
+    private RTEVResult callValidateEmail(ValidateEmailRequest request) {
+        dataValidator.validateRequest(request);
+        RTEVResult result = validationClient.validateEmail(
                 rtevConfiguration.getUriOne(),
                 rtevConfiguration.getApiKey(),
                 request.getEmail());
-        return validateValidationResponse(rtevResponse);
+        return dataValidator.validateResponse(result);
     }
 
     public RTEVAsyncResult validateEmailsAsync(ValidateEmailsRequest request) {
-        RTEVAsyncResult rtevResponse = validationClient.validateEmailsAsync(
+        dataValidator.validateRequest(request);
+        RTEVAsyncResult result = validationClient.validateEmailsAsync(
                 rtevConfiguration.getUriAsync(),
                 rtevConfiguration.getApiKey(),
-                formatEmails(request.getEmails()),
+                String.join("\n", request.getEmails()),
                 rtevConfiguration.getNotifyURL()
         );
-        return validateValidationResponse(rtevResponse);
-    }
-
-    private String formatEmails(List<String> emails) {
-        Preconditions.checkArgument(emails.size() <= EMAILS_LIMIT, "max " + EMAILS_LIMIT);
-        return String.join("\n", emails);
-    }
-
-    private <T extends StatusAware> T validateValidationResponse(T response) {
-        ValidationStatus status = ValidationStatus.of(response.getStatus());
-        HttpStatus errorStatus = RESPONSE_ERRORS_MAPPING.get(status);
-        if (errorStatus == null) {
-            return response;
-        } else {
-            throw new ResponseStatusException(errorStatus);
-        }
+        return dataValidator.validateResponse(result);
     }
 
     /**
-     * @param taskId
+     * @param taskId an unique identifier
      * @return CSV from https://www.email-validator.net/download.html
      */
     public TaskResult downloadTaskResult(String taskId) {
-        Response response = validationClient.downloadTaskResult(
+        dataValidator.validateNotBlank(taskId);
+        Response result = validationClient.downloadTaskResult(
                 rtevConfiguration.getUriDownload(),
                 taskId,
                 "download",
@@ -89,32 +75,15 @@ public class EmailValidationService {
                 "long",
                 "submit"
         );
-        validateTaskReportResponse(response);
+        dataValidator.validateResponse(result);
         try {
-            return new TaskResult(taskId,
-                    rowsParser.parse(response.body().asInputStream()));
+            return new TaskResult(taskId, parseBody(result));
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "unparsable response", e.getCause());
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "unparsable result", e.getCause());
         }
     }
 
-    private void validateTaskReportResponse(Response response) {
-        HttpStatus status = HttpStatus.valueOf(response.status());
-        if (status.is3xxRedirection()) {
-            String location = getHeader(HttpHeaders.LOCATION, response);
-            throw new ResponseStatusException(status, location);
-        }
-        if (status.is4xxClientError() || status.is5xxServerError()) {
-            throw new ResponseStatusException(status);
-        }
-        String responseContentType = getHeader(HttpHeaders.CONTENT_TYPE, response);
-        if (!responseContentType.contains(MediaType.APPLICATION_OCTET_STREAM_VALUE)) {
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, responseContentType);
-        }
-    }
-
-    private String getHeader(String name, Response response) {
-        return String.join(";",
-                response.headers().getOrDefault(name, Collections.emptyList()));
+    private List<RowValue> parseBody(Response result) throws IOException {
+        return rowsParser.parse(result.body().asInputStream());
     }
 }

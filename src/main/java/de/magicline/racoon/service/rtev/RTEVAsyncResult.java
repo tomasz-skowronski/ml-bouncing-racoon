@@ -4,7 +4,7 @@ import java.beans.ConstructorProperties;
 
 import com.google.common.base.MoreObjects;
 
-public class RTEVAsyncResult implements StatusAware {
+public class RTEVAsyncResult implements RTEVStatusAware {
 
     private final int status;
     private final String info;

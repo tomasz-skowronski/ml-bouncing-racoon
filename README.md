@@ -17,6 +17,12 @@ Alternatively you can use the following command to run all containers:
 
 `(cd ~/src/ml-bouncing-racoon/docker && docker-compose -f docker-compose-run-all.yaml up -d)`
 
+### Mocks
+
+[](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html)
+
+[](/src/test/http/mock.http)
+
 ## Database
 
 Access to the DEV and Stage database is via the Jump Server:
@@ -30,14 +36,9 @@ Access to the DEV and Stage database is via the Jump Server:
 
 ## Communication
 
-![](/doc/sequence.png)
-[](/doc/sequence.plantuml)
-
-### Mocks
-
-`/src/test/http/mock.http`
-
 ### RabbitMQ
+
+[management console](http://localhost:15672)
 
 ### External communication
 
@@ -81,25 +82,26 @@ we strongly recommend that you use only addresses with a `OK - Valid Address` (2
 
 #### Asynchronous Bulk API
 
-You send a request  and receive a callback by email (NotifyEmail) 
-or HTTP (NotifyURL) when processing is complete.
+![](/doc/sequence.png)
 
-1. You send a POST request to
-```
-http[s]://bulk.email-validator.net/api/verify as specified here:
-https://www.email-validator.net/api.html#bulk-api
-```
-On success you receive a HTTP reply with status 121 (Task Accepted)
-and the taskid of your validation task.
+[](/doc/sequence.plantuml)
 
-2. When your task is finished, we send you an email and a HTTP GET
-request to the NotifyURL (with a 'taskid' parameter in the URL).
+Racoon sends a request and receive a callback by email (NotifyEmail) or HTTP (NotifyURL) when processing is complete.
+
+1. Racoon sends a POST request to `http[s]://bulk.email-validator.net/api/verify` 
+as specified here: `https://www.email-validator.net/api.html#bulk-api`
+
+On success Racoon receives a HTTP reply with status 121 (Task Accepted)
+and the `taskid` of validation task.
+
+2. When task is finished, RTEV send to Racoon an email and a HTTP GET
+request to the NotifyURL (with a `taskid` parameter in the URL).
 
 3. The validation results can be downloaded as CSV file using this URL:
 
 `https://www.email-validator.net/download?id=<taskid>&cmd=download`
 
-You can specify the output with these additional parameters:
+Racoon can specify the output with these additional parameters:
 
 ```
 - validaddresses-nocatchall (valid addresses, without catchall addresses)
@@ -110,12 +112,10 @@ You can specify the output with these additional parameters:
 - output=long generates a CSV with the email addresses, validation result codes and detailed descriptions.
 ```
 
-To get the list of all valid addresses (including the catchall
-addresses) for a validation task, you can use this URL:
+To get the list of all valid addresses (including the catchall addresses) for a validation task, Racoon can use this URL:
 
 `https://www.email-validator.net/download?id=<taskid>&cmd=download&validaddresses-nocatchall&catchalladdresses`
 
-To get the list of invalid addresses for a validation task,
-you can use this URL:
+To get the list of invalid addresses for a validation task, Racoon can use this URL:
 
 `https://www.email-validator.net/download?id=<taskid>&cmd=download&invalidaddresses`

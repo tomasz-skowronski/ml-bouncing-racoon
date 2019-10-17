@@ -36,8 +36,13 @@ public class TasksController {
         return emailValidationService.downloadTaskResult(taskId);
     }
 
+    @GetMapping("/statuses")
+    public ValidationStatus[] getStatuses() {
+        return ValidationStatus.values();
+    }
+
     @GetMapping("/statuses/{code}")
-    public ValidationStatus getTaskResult(@PathVariable int code) {
+    public ValidationStatus getStatuses(@PathVariable int code) {
         return ValidationStatus.of(code);
     }
 
