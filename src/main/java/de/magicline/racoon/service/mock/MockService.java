@@ -1,10 +1,11 @@
 package de.magicline.racoon.service.mock;
 
 import de.magicline.racoon.service.rtev.RTEVRowValue;
+import de.magicline.racoon.service.rtev.RTEVValidationStatus;
 import de.magicline.racoon.service.status.StatusPublisher;
+import de.magicline.racoon.service.status.ValidationStatus;
 import de.magicline.racoon.service.task.RowValue;
 import de.magicline.racoon.service.task.TaskResult;
-import de.magicline.racoon.service.task.ValidationStatus;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -47,9 +48,9 @@ public class MockService {
 
     private int toStatus(String email, AtomicInteger correctness) {
         if (correctness.getAndDecrement() > 0) {
-            return ValidationStatus.OK_VALID_ADDRESS.getCode();
+            return RTEVValidationStatus.OK_VALID_ADDRESS.getCode();
         } else {
-            ValidationStatus[] values = ValidationStatus.values();
+            ValidationStatus[] values = RTEVValidationStatus.values();
             int index = Math.abs(email.hashCode()) % values.length;
             return values[index].getCode();
         }

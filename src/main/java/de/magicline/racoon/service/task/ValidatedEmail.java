@@ -1,24 +1,23 @@
 package de.magicline.racoon.service.task;
 
+import de.magicline.racoon.service.rtev.RTEVValidationStatus;
+
 public final class ValidatedEmail {
 
     private final String email;
-    private final ValidationStatus status;
+    private final RTEVValidationStatus status;
 
     public ValidatedEmail(String email, int status) {
         this.email = email;
-        this.status = ValidationStatus.of(status);
+        this.status = RTEVValidationStatus.of(status);
     }
 
     public String getEmail() {
         return email;
     }
 
-    public ValidationStatus getStatus() {
+    public RTEVValidationStatus getStatus() {
         return status;
     }
 
-    public ValidationStatus.Type getStatusType() {
-        return status.getType();
-    }
 }

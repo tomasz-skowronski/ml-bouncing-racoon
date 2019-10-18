@@ -1,15 +1,18 @@
-package de.magicline.racoon.service.task;
+package de.magicline.racoon.service.rtev;
+
+import de.magicline.racoon.service.status.ValidationStatus;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.common.base.MoreObjects;
 
-@JsonFormat(shape = JsonFormat.Shape.OBJECT)
-public enum ValidationStatus {
+/**
+ * https://www.email-validator.net/results.html
+ */
+public enum RTEVValidationStatus implements ValidationStatus {
 
     VALIDATION_DELAYED(Type.INDETERMINATE, 114, true,
             "SMTP address validation is still in progress (API only)."),
@@ -68,38 +71,43 @@ public enum ValidationStatus {
         INDETERMINATE, VALID, SUSPECT, INVALID;
     }
 
+    private static final Map<Integer, RTEVValidationStatus> MAPPING_BY_ID = Arrays.stream(values())
+            .collect(Collectors.toMap(
+                    RTEVValidationStatus::getCode,
+                    Function.identity()));
+
     private final Type type;
     private final int code;
     private final boolean retry;
     private final String description;
 
-    ValidationStatus(Type type, int code, boolean retry, String description) {
+    RTEVValidationStatus(Type type, int code, boolean retry, String description) {
         this.type = type;
         this.code = code;
         this.retry = retry;
         this.description = description;
     }
 
-    private static final Map<Integer, ValidationStatus> MAPPING_BY_ID = Arrays.stream(values())
-            .collect(Collectors.toMap(ValidationStatus::getCode, Function.identity()));
-
-
-    public static ValidationStatus of(int result) {
+    public static RTEVValidationStatus of(int result) {
         return MAPPING_BY_ID.get(result);
     }
 
-    public Type getType() {
-        return type;
+    @Override
+    public String getType() {
+        return type.name();
     }
 
+    @Override
     public int getCode() {
         return code;
     }
 
+    @Override
     public boolean isRetry() {
         return retry;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }

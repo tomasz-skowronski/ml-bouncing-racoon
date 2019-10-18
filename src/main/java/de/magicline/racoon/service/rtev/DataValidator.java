@@ -2,7 +2,7 @@ package de.magicline.racoon.service.rtev;
 
 import de.magicline.racoon.api.dto.ValidateEmailRequest;
 import de.magicline.racoon.api.dto.ValidateEmailsRequest;
-import de.magicline.racoon.service.task.ValidationStatus;
+import de.magicline.racoon.service.status.ValidationStatus;
 import feign.Response;
 
 import java.util.Collections;
@@ -20,9 +20,9 @@ public class DataValidator {
 
     private static final int EMAILS_LIMIT = 100_000;
     private static final Map<ValidationStatus, HttpStatus> RESPONSE_ERRORS_MAPPING = Map.of(
-            ValidationStatus.INVALID_BAD_ADDRESS, HttpStatus.BAD_REQUEST,
-            ValidationStatus.RATE_LIMIT_EXCEEDED, HttpStatus.TOO_MANY_REQUESTS,
-            ValidationStatus.API_KEY_INVALID_OR_DEPLETED, HttpStatus.FORBIDDEN);
+            RTEVValidationStatus.INVALID_BAD_ADDRESS, HttpStatus.BAD_REQUEST,
+            RTEVValidationStatus.RATE_LIMIT_EXCEEDED, HttpStatus.TOO_MANY_REQUESTS,
+            RTEVValidationStatus.API_KEY_INVALID_OR_DEPLETED, HttpStatus.FORBIDDEN);
 
     void validateRequest(ValidateEmailRequest request) {
         validateNotBlank(request.getEmail());
@@ -41,8 +41,8 @@ public class DataValidator {
     }
 
     <T extends RTEVStatusAware> T validateResponse(T result) {
-        ValidationStatus status = ValidationStatus.of(result.getStatus());
-        HttpStatus errorStatus = RESPONSE_ERRORS_MAPPING.get(status);
+        ValidationStatus resultStatus = RTEVValidationStatus.of(result.getStatus());
+        HttpStatus errorStatus = RESPONSE_ERRORS_MAPPING.get(resultStatus);
         if (errorStatus == null) {
             return result;
         } else {

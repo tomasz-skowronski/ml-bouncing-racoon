@@ -4,7 +4,6 @@ import de.magicline.racoon.api.dto.ValidateEmailRequest;
 import de.magicline.racoon.api.dto.ValidateEmailsRequest;
 import de.magicline.racoon.config.RTEVConfiguration;
 import de.magicline.racoon.service.task.TaskResult;
-import de.magicline.racoon.service.task.ValidationStatus;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 import ru.lanwen.wiremock.ext.WiremockUriResolver;
 
@@ -62,7 +61,7 @@ class EmailValidationServiceTest {
             String email = "a@a.pl";
             ValidateEmailRequest request = new ValidateEmailRequest(email);
             server.stubFor(post("/api/verify").willReturn(ok()
-                    .withBody(toJson(new RTEVResult(ValidationStatus.INVALID_ADDRESS_REJECTED)))
+                    .withBody(toJson(new RTEVResult(RTEVValidationStatus.INVALID_ADDRESS_REJECTED)))
             ));
 
             service.validateEmail(request);
@@ -75,7 +74,7 @@ class EmailValidationServiceTest {
             String email = "a@a.pl";
             ValidateEmailRequest request = new ValidateEmailRequest(email);
             server.stubFor(post("/api/verify").willReturn(ok()
-                    .withBody(toJson(new RTEVResult(ValidationStatus.RATE_LIMIT_EXCEEDED)))
+                    .withBody(toJson(new RTEVResult(RTEVValidationStatus.RATE_LIMIT_EXCEEDED)))
             ));
 
             assertThatThrownBy(() -> service.validateEmail(request))
@@ -95,7 +94,7 @@ class EmailValidationServiceTest {
 
         @Test
         void success() throws JsonProcessingException {
-            RTEVAsyncResult response = new RTEVAsyncResult(ValidationStatus.TASK_ACCEPTED.getCode(), taskId);
+            RTEVAsyncResult response = new RTEVAsyncResult(RTEVValidationStatus.TASK_ACCEPTED.getCode(), taskId);
             server.stubFor(post("/api/verify").willReturn(ok()
                     .withBody(toJson(response))
             ));

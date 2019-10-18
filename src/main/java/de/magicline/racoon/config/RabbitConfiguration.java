@@ -1,6 +1,6 @@
 package de.magicline.racoon.config;
 
-import de.magicline.racoon.service.task.ValidationStatus;
+import de.magicline.racoon.service.rtev.RTEVValidationStatus;
 
 import java.util.Arrays;
 import java.util.List;
@@ -70,13 +70,13 @@ public class RabbitConfiguration {
     public Declarables declareStatus() {
         List<Declarable> items = Stream.concat(
                 Stream.of(ExchangeBuilder.directExchange(STATUS_EXCHANGE).build()),
-                Arrays.stream(ValidationStatus.Type.values())
+                Arrays.stream(RTEVValidationStatus.Type.values())
                         .flatMap(this::createQueueAndBinding)
         ).collect(Collectors.toList());
         return new Declarables(items);
     }
 
-    private Stream<Declarable> createQueueAndBinding(ValidationStatus.Type type) {
+    private Stream<Declarable> createQueueAndBinding(RTEVValidationStatus.Type type) {
         String name = toStatusQueueName(type);
         return Stream.of(
                 QueueBuilder.durable(name).build(),
@@ -84,7 +84,7 @@ public class RabbitConfiguration {
         );
     }
 
-    public static String toStatusQueueName(ValidationStatus.Type type) {
+    public static String toStatusQueueName(RTEVValidationStatus.Type type) {
         return STATUS_EXCHANGE + "." + type.name().toLowerCase();
     }
 

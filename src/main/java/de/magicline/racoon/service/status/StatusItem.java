@@ -8,21 +8,15 @@ import com.google.common.base.MoreObjects;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class StatusItem {
 
-    private String email;
-    private int code;
+    private final String email;
 
-    @ConstructorProperties({"email", "code"})
-    public StatusItem(String email, int code) {
+    @ConstructorProperties({"email"})
+    public StatusItem(String email) {
         this.email = email;
-        this.code = code;
     }
 
     public String getEmail() {
         return email;
-    }
-
-    public int getCode() {
-        return code;
     }
 
     @Override
@@ -30,20 +24,18 @@ public class StatusItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StatusItem that = (StatusItem) o;
-        return code == that.code &&
-                Objects.equals(email, that.email);
+        return getEmail().equals(that.getEmail());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(email, code);
+        return Objects.hash(getEmail());
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("email", email)
-                .add("code", code)
                 .toString();
     }
 }

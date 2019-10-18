@@ -1,9 +1,15 @@
 package de.magicline.racoon.api;
 
 import de.magicline.racoon.service.rtev.EmailValidationService;
+import de.magicline.racoon.service.rtev.RTEVValidationStatus;
+import de.magicline.racoon.service.status.ValidationStatus;
+import de.magicline.racoon.service.status.ValidationStatusDto;
 import de.magicline.racoon.service.task.TaskCallbacksService;
 import de.magicline.racoon.service.task.TaskResult;
-import de.magicline.racoon.service.task.ValidationStatus;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,13 +43,15 @@ public class TasksController {
     }
 
     @GetMapping("/statuses")
-    public ValidationStatus[] getStatuses() {
-        return ValidationStatus.values();
+    public List<ValidationStatusDto> getStatuses() {
+        return Arrays.stream(RTEVValidationStatus.values())
+                .map(ValidationStatusDto::new)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/statuses/{code}")
     public ValidationStatus getStatuses(@PathVariable int code) {
-        return ValidationStatus.of(code);
+        return new ValidationStatusDto(RTEVValidationStatus.of(code));
     }
 
 }

@@ -3,7 +3,7 @@ package de.magicline.racoon.api;
 
 import de.magicline.racoon.service.mock.MockService;
 import de.magicline.racoon.service.rtev.RTEVAsyncResult;
-import de.magicline.racoon.service.task.ValidationStatus;
+import de.magicline.racoon.service.rtev.RTEVValidationStatus;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -43,7 +43,7 @@ public class MockController {
         String statusId = mockService.validate(emails, correct);
         return ResponseEntity.accepted()
                 .header("emails", String.valueOf(emails.size()))
-                .body(new RTEVAsyncResult(ValidationStatus.TASK_ACCEPTED.getCode(), statusId));
+                .body(new RTEVAsyncResult(RTEVValidationStatus.TASK_ACCEPTED.getCode(), statusId));
     }
 
     private List<String> parseEmails(Map<String, String> params) {

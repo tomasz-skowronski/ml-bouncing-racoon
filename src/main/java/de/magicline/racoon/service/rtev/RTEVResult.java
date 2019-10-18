@@ -1,11 +1,10 @@
 package de.magicline.racoon.service.rtev;
 
-import de.magicline.racoon.service.task.ValidationStatus;
-
 import java.beans.ConstructorProperties;
 
 import com.google.common.base.MoreObjects;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class RTEVResult implements RTEVStatusAware {
 
     private final int status;
@@ -14,7 +13,7 @@ public class RTEVResult implements RTEVStatusAware {
     private final Integer ratelimitRemain;
     private final Integer ratelimitSeconds;
 
-    public RTEVResult(ValidationStatus status) {
+    public RTEVResult(RTEVValidationStatus status) {
         this(status.getCode(), status.name(), status.getDescription(), null, null);
     }
 
