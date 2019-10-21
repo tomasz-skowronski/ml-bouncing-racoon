@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.google.common.base.MoreObjects;
-
 /**
  * https://www.email-validator.net/results.html
  */
@@ -110,13 +108,5 @@ public enum RTEVValidationStatus implements ValidationStatus {
     @Override
     public String getDescription() {
         return description;
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("code", code)
-                .add("description", description)
-                .toString();
     }
 }

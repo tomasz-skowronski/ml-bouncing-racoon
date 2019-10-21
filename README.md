@@ -4,6 +4,18 @@
 
 ## Introduction
 
+> We placed your SES account under review. 
+> You can still use this account to send email, 
+> but you should fully address the problems that led to your account being placed under review. 
+> If you don't address these issues by the end of the review period, 
+> we'll temporarily pause your account's ability to use SES to send email until you resolve these issues.
+> 
+> Your current bounce rate is 11.08%. 
+> We recommend that you maintain a bounce rate below 5%. 
+> If your bounce rate exceeds 10%, we might pause your ability to send additional email.
+>
+> — ses-review@amazon.com
+
 http://docs.aws.amazon.com/ses/latest/DeveloperGuide/best-practices-bounces-complaints.html
 
 ## Local development
@@ -16,12 +28,6 @@ Then you can start RacoonApplication from the IDE.
 Alternatively you can use the following command to run all containers:
 
 `(cd ~/src/ml-bouncing-racoon/docker && docker-compose -f docker-compose-run-all.yaml up -d)`
-
-### Mocks
-
-[](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html)
-
-[](/src/test/http/mock.http)
 
 ## Database
 
@@ -49,6 +55,12 @@ RTEV callbacks `GET /racoon/tasks/callbacks?taskid=<taskId>`
 * [DEV](https://bouncing-racoon.dev.magicline.com/swagger-ui.html)
 * [STAGE](https://bouncing-racoon.stage.magicline.com/swagger-ui.html)
 * [PROD](https://bouncing-racoon.magicline.com/swagger-ui.html)
+
+### Mocks
+
+[HTTP client in IDE](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html)
+
+[mock.http](/src/test/http/mock.http)
 
 ### Real-Time Email Validation API
 
@@ -83,8 +95,7 @@ we strongly recommend that you use only addresses with a `OK - Valid Address` (2
 #### Asynchronous Bulk API
 
 ![](/doc/sequence.png)
-
-[](/doc/sequence.plantuml)
+[sequence.plantuml](/doc/sequence.plantuml)
 
 Racoon sends a request and receive a callback by email (NotifyEmail) or HTTP (NotifyURL) when processing is complete.
 

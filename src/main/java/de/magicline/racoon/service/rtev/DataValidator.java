@@ -2,6 +2,7 @@ package de.magicline.racoon.service.rtev;
 
 import de.magicline.racoon.api.dto.ValidateEmailRequest;
 import de.magicline.racoon.api.dto.ValidateEmailsRequest;
+import de.magicline.racoon.config.RacoonMetrics;
 import de.magicline.racoon.service.status.ValidationStatus;
 import feign.Response;
 
@@ -22,10 +23,11 @@ public class DataValidator {
     private static final Map<ValidationStatus, HttpStatus> RESPONSE_ERRORS_MAPPING = Map.of(
             RTEVValidationStatus.INVALID_BAD_ADDRESS, HttpStatus.BAD_REQUEST,
             RTEVValidationStatus.RATE_LIMIT_EXCEEDED, HttpStatus.TOO_MANY_REQUESTS,
-            RTEVValidationStatus.API_KEY_INVALID_OR_DEPLETED, HttpStatus.FORBIDDEN);
+            RTEVValidationStatus.API_KEY_INVALID_OR_DEPLETED, HttpStatus.PAYMENT_REQUIRED);
 
     void validateRequest(ValidateEmailRequest request) {
         validateNotBlank(request.getEmail());
+        RacoonMetrics.incrementValidations(1);
     }
 
     void validateNotBlank(String content) {
@@ -35,7 +37,10 @@ public class DataValidator {
     }
 
     void validateRequest(ValidateEmailsRequest request) {
-        if (request.getEmails().size() > EMAILS_LIMIT) {
+        int size = request.getEmails().size();
+        if (size <= EMAILS_LIMIT) {
+            RacoonMetrics.incrementValidations(size);
+        } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "max emails: " + EMAILS_LIMIT);
         }
     }
@@ -44,25 +49,31 @@ public class DataValidator {
         ValidationStatus resultStatus = RTEVValidationStatus.of(result.getStatus());
         HttpStatus errorStatus = RESPONSE_ERRORS_MAPPING.get(resultStatus);
         if (errorStatus == null) {
-            return result;
+            RacoonMetrics.incrementResponseStatus(HttpStatus.OK);
         } else {
-            throw new ResponseStatusException(errorStatus);
+            throwResponseStatusException(errorStatus, null);
         }
+        return result;
     }
 
     void validateResponse(Response result) {
         HttpStatus status = HttpStatus.valueOf(result.status());
         if (status.is3xxRedirection()) {
             String location = getHeader(HttpHeaders.LOCATION, result);
-            throw new ResponseStatusException(status, location);
+            throwResponseStatusException(status, location);
         }
         if (status.is4xxClientError() || status.is5xxServerError()) {
-            throw new ResponseStatusException(status);
+            throwResponseStatusException(status, null);
         }
         String resultContentType = getHeader(HttpHeaders.CONTENT_TYPE, result);
         if (!resultContentType.contains(MediaType.APPLICATION_OCTET_STREAM_VALUE)) {
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, resultContentType);
+            throwResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, resultContentType);
         }
+    }
+
+    private void throwResponseStatusException(HttpStatus status, String reason) {
+        RacoonMetrics.incrementResponseStatus(status);
+        throw new ResponseStatusException(status, reason);
     }
 
     private String getHeader(String name, Response result) {

@@ -1,6 +1,13 @@
 server:
   port: 8107
 
+management:
+  metrics.export.prometheus.enabled: true
+  endpoint:
+    metrics.enabled: true
+    prometheus.enabled: true
+  endpoints.web.exposure.include: "metrics,prometheus"
+
 spring:
   application:
     name: bouncing-racoon
@@ -17,6 +24,10 @@ spring:
     table: schema_version
     locations: classpath:db/migrations
     baseline-on-migrate: true
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: "validate"
   rabbitmq:
     host:         ${rabbitmq.host:localhost}
     username:     ${rabbitmq.username:testuser}
@@ -26,6 +37,12 @@ spring:
 
 app:
   rtev:
+    uri:
+#      one: "http://localhost:8107/racoon/mock"
+#      async: "http://localhost:8107/racoon/mock"
+      one: "https://api.email-validator.net"
+      async: "https://bulk.email-validator.net"
+      download: "https://www.email-validator.net"
     apiKey: "ev-7791b803c271ab303acfa5029b1847e1"
     notifyURL: http://localhost:8107/racoon/tasks/callbacks
     retry:

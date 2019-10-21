@@ -3,11 +3,13 @@ package de.magicline.racoon.service.rtev;
 import de.magicline.racoon.api.dto.ValidateEmailRequest;
 import de.magicline.racoon.api.dto.ValidateEmailsRequest;
 import de.magicline.racoon.config.RTEVConfiguration;
+import de.magicline.racoon.config.RacoonMetrics;
 import de.magicline.racoon.service.task.RowValue;
 import de.magicline.racoon.service.task.TaskResult;
 import feign.Response;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
+import javax.annotation.PostConstruct;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,16 +35,22 @@ public class EmailValidationService {
         this.dataValidator = dataValidator;
     }
 
+    @PostConstruct
+    void init(){
+        retry.getEventPublisher().onEvent(RacoonMetrics::incrementValidationRetry);
+    }
+
     public RTEVResult validateEmail(ValidateEmailRequest request) {
+        dataValidator.validateRequest(request);
         return retry.executeSupplier(() -> callValidateEmail(request));
     }
 
     private RTEVResult callValidateEmail(ValidateEmailRequest request) {
-        dataValidator.validateRequest(request);
         RTEVResult result = validationClient.validateEmail(
                 rtevConfiguration.getUriOne(),
                 rtevConfiguration.getApiKey(),
                 request.getEmail());
+        RacoonMetrics.incrementValidationStatus(result.getStatus());
         return dataValidator.validateResponse(result);
     }
 

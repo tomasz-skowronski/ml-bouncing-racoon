@@ -1,9 +1,10 @@
 package de.magicline.racoon.service.mock;
 
+import de.magicline.racoon.service.rtev.RTEVAsyncResult;
+import de.magicline.racoon.service.rtev.RTEVResult;
 import de.magicline.racoon.service.rtev.RTEVRowValue;
 import de.magicline.racoon.service.rtev.RTEVValidationStatus;
 import de.magicline.racoon.service.status.StatusPublisher;
-import de.magicline.racoon.service.status.ValidationStatus;
 import de.magicline.racoon.service.task.RowValue;
 import de.magicline.racoon.service.task.TaskResult;
 
@@ -24,18 +25,24 @@ public class MockService {
         this.statusPublisher = statusPublisher;
     }
 
-    public String validate(List<String> emails, BigDecimal correct) {
+    public RTEVResult validate(String email) {
+        return new RTEVResult(toStatus(email, 0));
+    }
+
+    public RTEVAsyncResult validate(List<String> emails, BigDecimal correct) {
         AtomicInteger correctness = createCorrectnessCounter(emails, correct);
         String taskId = String.valueOf(emails.hashCode());
         List<RowValue> rows = toRowValues(emails, correctness);
-        TaskResult taskResult = new TaskResult(taskId, rows);
-        statusPublisher.publishStatusMessages(taskResult);
-        return taskId;
+        statusPublisher.publishStatusMessages(new TaskResult(taskId, rows));
+        return new RTEVAsyncResult(RTEVValidationStatus.TASK_ACCEPTED.getCode(), taskId);
     }
 
     private List<RowValue> toRowValues(List<String> emails, AtomicInteger correctness) {
         return emails.stream()
-                .map(e -> new RTEVRowValue(e, toStatus(e, correctness), "..."))
+                .map(e -> {
+                    int status = toStatus(e, correctness.getAndDecrement()).getCode();
+                    return new RTEVRowValue(e, status, "...");
+                })
                 .collect(Collectors.toList());
     }
 
@@ -46,13 +53,13 @@ public class MockService {
         return new AtomicInteger(correctness.intValue());
     }
 
-    private int toStatus(String email, AtomicInteger correctness) {
-        if (correctness.getAndDecrement() > 0) {
-            return RTEVValidationStatus.OK_VALID_ADDRESS.getCode();
+    private RTEVValidationStatus toStatus(String email, Integer correctness) {
+        if (correctness > 0) {
+            return RTEVValidationStatus.OK_VALID_ADDRESS;
         } else {
-            ValidationStatus[] values = RTEVValidationStatus.values();
+            RTEVValidationStatus[] values = RTEVValidationStatus.values();
             int index = Math.abs(email.hashCode()) % values.length;
-            return values[index].getCode();
+            return values[index];
         }
     }
 }

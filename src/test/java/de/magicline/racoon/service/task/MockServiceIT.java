@@ -15,6 +15,7 @@ import io.github.resilience4j.retry.RetryConfig;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -24,8 +25,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
+@SuppressWarnings("unused")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MockServiceIT {
 
@@ -33,6 +34,7 @@ class MockServiceIT {
     @LocalServerPort
     private int port;
     private final ConcurrentLinkedQueue<StatusMessage> receivedSuspects = new ConcurrentLinkedQueue<>();
+    private CountDownLatch count;
 
     @BeforeEach
     void setUp() {
@@ -47,15 +49,17 @@ class MockServiceIT {
     }
 
     @Test
-    void validateUsingMockAndRetrieveStatusMessage() {
+    void validateUsingMockAndRetrieveStatusMessage() throws InterruptedException {
         ValidateEmailsRequest request = new ValidateEmailsRequest(
                 List.of("1@a.pl", "2@a.pl", "3@a.pl", "4@a.pl", "5@a.pl"));
         String taskId = "-392623883";
+        count = new CountDownLatch(request.getEmails().size());
 
         RTEVAsyncResult response = testee.validateEmailsAsync(request);
 
         assertThat(response.getInfo()).isEqualTo(taskId);
-        await().atMost(2, TimeUnit.SECONDS).until(() -> receivedSuspects.size() == 2);
+        count.await(2, TimeUnit.SECONDS);
+        assertThat(count.getCount()).isZero();
         assertThat(receivedSuspects).contains(
                 new StatusMessage(taskId,
                         new ValidationStatusDto(RTEVValidationStatus.LOCAL_ADDRESS),
@@ -67,8 +71,24 @@ class MockServiceIT {
     }
 
     @RabbitListener(queues = "ml.racoon.status.suspect")
-    void onSuspectStatusMessage(StatusMessage statusMessage) {
+    void onSuspect(StatusMessage statusMessage) {
+        count.countDown();
         receivedSuspects.add(statusMessage);
+    }
+
+    @RabbitListener(queues = "ml.racoon.status.valid")
+    void onValid(StatusMessage statusMessage) {
+        count.countDown();
+    }
+
+    @RabbitListener(queues = "ml.racoon.status.invalid")
+    void onInvalid(StatusMessage statusMessage) {
+        count.countDown();
+    }
+
+    @RabbitListener(queues = "ml.racoon.status.indeterminate")
+    void onIndeterminate(StatusMessage statusMessage) {
+        count.countDown();
     }
 
 }

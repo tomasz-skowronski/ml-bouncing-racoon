@@ -30,10 +30,6 @@ import com.google.common.annotations.VisibleForTesting;
 @Configuration
 public class RTEVConfiguration {
 
-    private static final String URI_ONE = "https://api.email-validator.net";
-    private static final String URI_ASYNC = "https://bulk.email-validator.net";
-    private static final String URI_DOWNLOAD = "https://www.email-validator.net";
-
     private final URI uriOne;
     private final URI uriAsync;
     private final URI uriDownload;
@@ -42,24 +38,14 @@ public class RTEVConfiguration {
     private int retryMaxAttempts;
     private long retryInitialIntervalSec;
 
-    /**
-     * For exploratory tests purpose
-     */
-    @VisibleForTesting
-    public RTEVConfiguration(String apiKey, String notifyURL) {
-        this(URI_ONE, URI_ASYNC, URI_DOWNLOAD, apiKey, notifyURL, 1, 1);
-    }
-
-    @Autowired
     public RTEVConfiguration(
-            @Value("${app.rtev.uri.one:" + URI_ONE + "}") String uriOne,
-            @Value("${app.rtev.uri.async:" + URI_ASYNC + "}") String uriAsync,
-            @Value("${app.rtev.uri.download:" + URI_DOWNLOAD + "}") String uriDownload,
+            @Value("${app.rtev.uri.one}") String uriOne,
+            @Value("${app.rtev.uri.async}") String uriAsync,
+            @Value("${app.rtev.uri.download}") String uriDownload,
             @Value("${app.rtev.apiKey}") String apiKey,
             @Value("${app.rtev.notifyURL}") String notifyURL,
             @Value("${app.rtev.retry.maxAttempts}") int retryMaxAttempts,
-            @Value("${app.rtev.retry.initialIntervalSec}") long retryInitialIntervalSec
-    ) {
+            @Value("${app.rtev.retry.initialIntervalSec}") long retryInitialIntervalSec) {
         this.uriOne = URI.create(uriOne);
         this.uriAsync = URI.create(uriAsync);
         this.uriDownload = URI.create(uriDownload);

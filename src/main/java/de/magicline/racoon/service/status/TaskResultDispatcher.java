@@ -1,5 +1,6 @@
 package de.magicline.racoon.service.status;
 
+import de.magicline.racoon.config.RacoonMetrics;
 import de.magicline.racoon.service.task.TaskResult;
 import de.magicline.racoon.service.task.ValidatedEmail;
 
@@ -16,9 +17,11 @@ public class TaskResultDispatcher {
 
     private static final Logger LOGGER = LogManager.getLogger(TaskResultDispatcher.class);
 
+    @SuppressWarnings("squid:S3864")
     Map<ValidationStatus, List<ValidatedEmail>> dispatch(TaskResult taskResult) {
         Map<ValidationStatus, List<ValidatedEmail>> byStatus = taskResult.getRows()
                 .stream()
+                .peek(r -> RacoonMetrics.incrementValidationStatus(r.getResult()))
                 .map(r -> new ValidatedEmail(r.getEmail(), r.getResult()))
                 .collect(Collectors.groupingBy(ValidatedEmail::getStatus));
         LOGGER.info("dispatch messages: {}", sum(byStatus));

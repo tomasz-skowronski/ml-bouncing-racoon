@@ -1,3 +1,12 @@
+POST http://localhost:8107/racoon/validation
+Content-Type: application/json
+
+{
+  "email": "b@b.pl2344"
+}
+
+###
+
 POST http://localhost:8107/racoon/validation/async
 Content-Type: application/json
 

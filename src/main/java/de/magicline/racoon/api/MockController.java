@@ -3,7 +3,8 @@ package de.magicline.racoon.api;
 
 import de.magicline.racoon.service.mock.MockService;
 import de.magicline.racoon.service.rtev.RTEVAsyncResult;
-import de.magicline.racoon.service.rtev.RTEVValidationStatus;
+import de.magicline.racoon.service.rtev.RTEVResult;
+import de.magicline.racoon.service.rtev.RTEVStatusAware;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -23,6 +24,7 @@ import com.google.common.base.Preconditions;
 @RequestMapping("/racoon/mock")
 public class MockController {
 
+    private static final String DELIMITER = "\n";
     private final MockService mockService;
 
     public MockController(MockService mockService) {
@@ -31,25 +33,40 @@ public class MockController {
 
     /**
      * @param correct expected minimum level of correctness (valid e-mails)
-     * @param params  form urlencoded values
-     * @return emails quantity, statusId
+     * @param params  form urlencoded EmailAddress - one or more (sync/async)
+     * @return taskId (async) or validation status (sync)
      */
     @PostMapping(value = "/api/verify",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<RTEVAsyncResult> verify(@RequestParam(defaultValue = "0.2") BigDecimal correct,
+    public ResponseEntity<RTEVStatusAware> verify(@RequestParam(defaultValue = "0.2") BigDecimal correct,
                                                   @RequestParam Map<String, String> params) {
-        List<String> emails = parseEmails(params);
-        String statusId = mockService.validate(emails, correct);
-        return ResponseEntity.accepted()
-                .header("emails", String.valueOf(emails.size()))
-                .body(new RTEVAsyncResult(RTEVValidationStatus.TASK_ACCEPTED.getCode(), statusId));
+        if (isAsyncExpected(params)) {
+            return ResponseEntity.accepted().body(verifyAsync(params, correct));
+        } else {
+            return ResponseEntity.ok(verifySync(params));
+        }
     }
 
-    private List<String> parseEmails(Map<String, String> params) {
+    private boolean isAsyncExpected(Map<String, String> params) {
+        return getEmails(params).contains(DELIMITER)
+                || params.containsKey("NotifyURL")
+                || params.containsKey("NotifyEmail");
+    }
+
+    private String getEmails(Map<String, String> params) {
         String emailAddress = params.get("EmailAddress");
         Preconditions.checkArgument(emailAddress != null, "no EmailAddress");
-        return Arrays.asList(emailAddress.split("\n"));
+        return emailAddress;
+    }
+
+    private RTEVAsyncResult verifyAsync(Map<String, String> params, BigDecimal correct) {
+        List<String> emails = Arrays.asList(getEmails(params).split(DELIMITER));
+        return mockService.validate(emails, correct);
+    }
+
+    private RTEVResult verifySync(@RequestParam Map<String, String> params) {
+        return mockService.validate(getEmails(params));
     }
 
 }
