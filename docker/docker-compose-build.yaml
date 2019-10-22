@@ -2,7 +2,7 @@ version: "3"
 
 services:
   postgres:
-    image: postgres:9.6-alpine
+    image: postgres:10.7-alpine
     ports:
       - "65432:5432"
     restart: always
@@ -35,7 +35,7 @@ services:
     links:
         - postgres
     volumes:
-        - ".:/app"
+        - "./../:/app"
         - "~/.m2/repository:/root/.m2/repository"
     working_dir: /app
     command: ["mvn", "-e","-B", "clean", "install","-Dml.log.dir=/tmp" ]

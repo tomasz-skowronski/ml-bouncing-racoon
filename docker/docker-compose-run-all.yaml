@@ -5,7 +5,7 @@ services:
     ports:
       - "65432:5432"
     restart: always
-    image: postgres:9.6-alpine
+    image: postgres:10.7-alpine
     volumes:
           - "./init.sql:/docker-entrypoint-initdb.d/init.sql"
   rabbitmq:
@@ -36,8 +36,3 @@ services:
       - postgres
     ports:
       - "8107:8107"
-#  text-mock:
-#    image: quay.io/sportalliance/text-message-mock-api
-#    ports:
-#          - "2525:2525"
-#          - "9107:9107"
