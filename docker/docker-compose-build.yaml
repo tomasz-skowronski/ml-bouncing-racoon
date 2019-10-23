@@ -34,6 +34,7 @@ services:
         - RABBITMQ_PASSWORD=pass
     links:
         - postgres
+        - rabbitmq
     volumes:
         - "./../:/app"
         - "~/.m2/repository:/root/.m2/repository"
