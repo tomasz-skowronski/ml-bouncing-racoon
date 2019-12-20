@@ -1,6 +1,6 @@
 package de.magicline.racoon.api.dto;
 
-import de.magicline.racoon.service.rtev.RTEVResult;
+import de.magicline.racoon.domain.provider.dto.RTEVResult;
 
 @SuppressWarnings("unused")
 public class ValidateEmailResponse {

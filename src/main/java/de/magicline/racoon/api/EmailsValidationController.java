@@ -4,9 +4,9 @@ import de.magicline.racoon.api.dto.ValidateEmailRequest;
 import de.magicline.racoon.api.dto.ValidateEmailResponse;
 import de.magicline.racoon.api.dto.ValidateEmailsRequest;
 import de.magicline.racoon.api.dto.ValidateEmailsResponse;
-import de.magicline.racoon.service.rtev.EmailValidationService;
-import de.magicline.racoon.service.rtev.RTEVAsyncResult;
-import de.magicline.racoon.service.rtev.RTEVResult;
+import de.magicline.racoon.domain.provider.EmailValidationService;
+import de.magicline.racoon.domain.provider.dto.RTEVAsyncResult;
+import de.magicline.racoon.domain.provider.dto.RTEVResult;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;

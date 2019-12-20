@@ -29,6 +29,15 @@ Alternatively you can use the following command to run all containers:
 
 `(cd ~/src/ml-bouncing-racoon/docker && docker-compose -f docker-compose-run-all.yaml up -d)`
 
+### Code structure
+
+* de.magicline.racoon.api
+* de.magicline.racoon.config
+* de.magicline.racoon.domain (provider, task, status)
+
+![](/doc/packages.png)
+[packages.plantuml](/doc/packages.plantuml)
+
 ## Database
 
 Access to the DEV and Stage database is via the Jump Server:

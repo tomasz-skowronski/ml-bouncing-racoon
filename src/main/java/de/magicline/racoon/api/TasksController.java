@@ -1,11 +1,11 @@
 package de.magicline.racoon.api;
 
-import de.magicline.racoon.service.rtev.EmailValidationService;
-import de.magicline.racoon.service.rtev.RTEVValidationStatus;
-import de.magicline.racoon.service.status.ValidationStatus;
-import de.magicline.racoon.service.status.ValidationStatusDto;
-import de.magicline.racoon.service.task.TaskCallbacksService;
-import de.magicline.racoon.service.task.TaskResult;
+import de.magicline.racoon.domain.provider.EmailValidationService;
+import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
+import de.magicline.racoon.domain.status.dto.ValidationStatus;
+import de.magicline.racoon.domain.status.dto.ValidationStatusDto;
+import de.magicline.racoon.domain.task.TaskCallbacksService;
+import de.magicline.racoon.domain.task.dto.TaskResult;
 
 import java.util.Arrays;
 import java.util.List;

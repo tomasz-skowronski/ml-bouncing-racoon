@@ -1,6 +1,6 @@
 package de.magicline.racoon.config;
 
-import de.magicline.racoon.service.rtev.RTEVValidationStatus;
+import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
 
 import java.util.Arrays;
 import java.util.List;

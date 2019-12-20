@@ -1,0 +1,13 @@
+@startuml
+
+actor client
+actor RTEV
+
+client -> [api]
+[api] -> [provider] : validate emails
+[provider] -> RTEV: use
+RTEV -> [task] : create|complete
+[task] -> [status] : publish
+[status] -> client : notify
+
+@enduml
