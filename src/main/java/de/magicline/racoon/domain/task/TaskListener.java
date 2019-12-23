@@ -26,12 +26,12 @@ public class TaskListener {
 
     @RabbitListener(queues = RabbitConfiguration.TASK_QUEUE)
     public void onTaskCompleted(String taskId) {
-        LOGGER.debug("onTaskCompleted {} ", taskId);
+        LOGGER.info("onTaskCompleted: {} ", taskId);
         try {
             TaskResult taskResult = emailValidationService.downloadTaskResult(taskId);
             statusPublisher.publishStatusMessages(taskResult);
         } catch (Exception e) {
-            LOGGER.error("Exception on text message order:" + taskId, e);
+            LOGGER.error("onTaskCompleted FAILED: {}", taskId, e);
             throw new AmqpRejectAndDontRequeueException(e);
         }
     }

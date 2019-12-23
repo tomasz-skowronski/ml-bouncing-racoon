@@ -38,6 +38,16 @@ Alternatively you can use the following command to run all containers:
 ![](/doc/packages.png)
 [packages.plantuml](/doc/packages.plantuml)
 
+### Tests
+
+* unit: *Test.java)
+* integration: *IT.java
+* web: *.http (IntelliJ)
+
+Known issues: 
+
+* `@MockBean`/`@TestConfiguration` doesn't work when run all tests. Workaround: `@DirtiesContext` for other IT.
+
 ## Database
 
 Access to the DEV and Stage database is via the Jump Server:
@@ -54,6 +64,8 @@ Access to the DEV and Stage database is via the Jump Server:
 ### RabbitMQ
 
 [management console](http://localhost:15672)
+
+[Docker](/docker/docker-compose.yaml)
 
 ### External communication
 

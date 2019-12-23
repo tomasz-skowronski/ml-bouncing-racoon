@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.annotations.VisibleForTesting;
+
 @RestController
 @RequestMapping("/racoon/tasks")
 public class TasksController {
@@ -25,18 +27,19 @@ public class TasksController {
     private final TaskCallbacksService tasksCallbacksService;
     private final EmailValidationService emailValidationService;
 
-
     public TasksController(TaskCallbacksService tasksCallbacksService, EmailValidationService emailValidationService) {
         this.tasksCallbacksService = tasksCallbacksService;
         this.emailValidationService = emailValidationService;
     }
 
+    @VisibleForTesting
     @GetMapping("/callbacks")
     public ResponseEntity<String> complete(@RequestParam("taskid") String taskId) {
         tasksCallbacksService.complete(taskId);
         return ResponseEntity.accepted().body("OK");
     }
 
+    @VisibleForTesting
     @GetMapping("/{taskId}")
     public TaskResult getTaskResult(@PathVariable String taskId) {
         return emailValidationService.downloadTaskResult(taskId);

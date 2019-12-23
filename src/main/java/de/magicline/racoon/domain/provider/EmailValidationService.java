@@ -29,7 +29,11 @@ public class EmailValidationService {
     private final RowsParser rowsParser;
     private final DataValidator dataValidator;
 
-    public EmailValidationService(ProviderConfiguration providerConfiguration, RTEVValidationClient validationClient, RetryConfig retryConfig, RowsParser rowsParser, DataValidator dataValidator) {
+    public EmailValidationService(ProviderConfiguration providerConfiguration,
+                                  RTEVValidationClient validationClient,
+                                  RetryConfig retryConfig,
+                                  RowsParser rowsParser,
+                                  DataValidator dataValidator) {
         this.providerConfiguration = providerConfiguration;
         this.validationClient = validationClient;
         this.retry = Retry.of("rtev", retryConfig);
@@ -73,7 +77,7 @@ public class EmailValidationService {
      */
     public TaskResult downloadTaskResult(String taskId) {
         dataValidator.validateNotBlank(taskId);
-        Response result = validationClient.downloadTaskResult(
+        Response response = validationClient.downloadTaskResult(
                 providerConfiguration.getUriDownload(),
                 taskId,
                 "download",
@@ -85,15 +89,15 @@ public class EmailValidationService {
                 "long",
                 "submit"
         );
-        dataValidator.validateResponse(result);
+        dataValidator.validateResponse(response);
         try {
-            return new TaskResult(taskId, parseBody(result));
+            return new TaskResult(taskId, parseBody(response));
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "unparsable result", e.getCause());
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "unparsable", e);
         }
     }
 
-    private List<RowValue> parseBody(Response result) throws IOException {
-        return rowsParser.parse(result.body().asInputStream());
+    private List<RowValue> parseBody(Response response) throws IOException {
+        return rowsParser.parse(response.body().asInputStream());
     }
 }

@@ -6,7 +6,7 @@ import java.util.Objects;
 
 import com.google.common.base.MoreObjects;
 
-@SuppressWarnings({"unused", "WeakerAccess"})
+@SuppressWarnings("unused")
 public class StatusMessage {
 
     private final String taskId;

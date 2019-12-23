@@ -30,7 +30,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.serviceUnavailable
 import static com.github.tomakehurst.wiremock.client.WireMock.status;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static de.magicline.racoon.common.HttpHelper.hasFormParam;
-import static de.magicline.racoon.common.HttpHelper.toJson;
+import static de.magicline.racoon.common.SerializationHelper.toJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;

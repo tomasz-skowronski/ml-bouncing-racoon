@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import com.google.common.base.MoreObjects;
 
-@SuppressWarnings({"unused", "WeakerAccess"})
+@SuppressWarnings("unused")
 public class StatusItem {
 
     private final String email;

@@ -4,10 +4,10 @@ import de.magicline.racoon.api.dto.ValidateEmailsRequest;
 import de.magicline.racoon.config.ProviderConfiguration;
 import de.magicline.racoon.domain.provider.DataValidator;
 import de.magicline.racoon.domain.provider.EmailValidationService;
-import de.magicline.racoon.domain.provider.dto.RTEVAsyncResult;
 import de.magicline.racoon.domain.provider.RTEVValidationClient;
-import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
 import de.magicline.racoon.domain.provider.RowsParser;
+import de.magicline.racoon.domain.provider.dto.RTEVAsyncResult;
+import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
 import de.magicline.racoon.domain.status.dto.StatusItem;
 import de.magicline.racoon.domain.status.dto.StatusMessage;
 import de.magicline.racoon.domain.status.dto.ValidationStatusDto;
@@ -18,17 +18,22 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SuppressWarnings("unused")
+@DirtiesContext
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class MockServiceIT {
+
+    private static final Logger LOGGER = LogManager.getLogger(MockServiceIT.class);
 
     private EmailValidationService testee;
     @LocalServerPort
@@ -72,22 +77,27 @@ class MockServiceIT {
 
     @RabbitListener(queues = "ml.racoon.status.suspect")
     void onSuspect(StatusMessage statusMessage) {
-        count.countDown();
+        onStatusMessage(statusMessage);
         receivedSuspects.add(statusMessage);
     }
 
     @RabbitListener(queues = "ml.racoon.status.valid")
     void onValid(StatusMessage statusMessage) {
-        count.countDown();
+        onStatusMessage(statusMessage);
     }
 
     @RabbitListener(queues = "ml.racoon.status.invalid")
     void onInvalid(StatusMessage statusMessage) {
-        count.countDown();
+        onStatusMessage(statusMessage);
     }
 
     @RabbitListener(queues = "ml.racoon.status.indeterminate")
     void onIndeterminate(StatusMessage statusMessage) {
+        onStatusMessage(statusMessage);
+    }
+
+    private void onStatusMessage(StatusMessage statusMessage) {
+        LOGGER.debug(statusMessage);
         count.countDown();
     }
 
