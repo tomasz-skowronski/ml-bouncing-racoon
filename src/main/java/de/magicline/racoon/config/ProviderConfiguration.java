@@ -31,6 +31,7 @@ public class ProviderConfiguration {
     private final URI uriAsync;
     private final URI uriDownload;
     private String notifyURL;
+    private String notifyEmail;
     private String apiKey;
     private int retryMaxAttempts;
     private long retryInitialIntervalSec;
@@ -39,14 +40,16 @@ public class ProviderConfiguration {
             @Value("${app.rtev.uri.one}") String uriOne,
             @Value("${app.rtev.uri.async}") String uriAsync,
             @Value("${app.rtev.uri.download}") String uriDownload,
-            @Value("${app.rtev.apiKey}") String apiKey,
             @Value("${app.rtev.notifyURL}") String notifyURL,
+            @Value("${app.rtev.notifyEmail}") String notifyEmail,
+            @Value("${app.rtev.apiKey}") String apiKey,
             @Value("${app.rtev.retry.maxAttempts}") int retryMaxAttempts,
             @Value("${app.rtev.retry.initialIntervalSec}") long retryInitialIntervalSec) {
         this.uriOne = URI.create(uriOne);
         this.uriAsync = URI.create(uriAsync);
         this.uriDownload = URI.create(uriDownload);
         this.notifyURL = notifyURL;
+        this.notifyEmail = notifyEmail;
         this.apiKey = apiKey;
         this.retryMaxAttempts = retryMaxAttempts;
         this.retryInitialIntervalSec = retryInitialIntervalSec;
@@ -109,5 +112,9 @@ public class ProviderConfiguration {
 
     public String getNotifyURL() {
         return notifyURL;
+    }
+
+    public String getNotifyEmail() {
+        return notifyEmail;
     }
 }

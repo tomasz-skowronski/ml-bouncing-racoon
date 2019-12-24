@@ -24,7 +24,7 @@ class EmailValidationServiceRetryTest {
     private static final int MAX_ATTEMPTS = 2;
     private EmailValidationService testee;
     private ProviderConfiguration providerConfiguration = new ProviderConfiguration(
-            "", "", "", "", null, MAX_ATTEMPTS, 1);
+            "", "", "", "", "", null, MAX_ATTEMPTS, 1);
     private DataValidator dataValidator = new DataValidator();
     @Mock
     private RTEVValidationClient validationClient;

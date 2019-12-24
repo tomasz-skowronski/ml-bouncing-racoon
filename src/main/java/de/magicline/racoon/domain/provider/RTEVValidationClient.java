@@ -24,13 +24,15 @@ public interface RTEVValidationClient {
             URI uri,
             @Param("APIKey") String apiKey,
             @Param("EmailAddress") String emailAddresses,
-            @Param("NotifyURL") String notifyURL);
+            @Param("NotifyURL") String notifyURL,
+            @Param("NotifyEmail") String notifyEmail);
 
     @RequestLine("POST /download.html")
     @Headers(value = {
             "Content-Type: application/x-www-form-urlencoded; charset=UTF-8",
             "Accept: application/octet-stream"
     })
+    @SuppressWarnings("squid:S00107")
     Response downloadTaskResult(
             URI uri,
             @Param("id") String taskId,
@@ -40,7 +42,6 @@ public interface RTEVValidationClient {
             @Param("invalidaddresses") String invalidFilter,
             @Param("suspectaddresses") String suspectFilter,
             @Param("indeterminateaddresses") String indeterminateFilter,
-            @Param("output") String csvFormat,
-            @Param("submit") String submit);
+            @Param("output") String csvFormat);
 
 }

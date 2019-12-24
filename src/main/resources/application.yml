@@ -45,6 +45,7 @@ app:
       download: "https://www.email-validator.net"
     apiKey: "ev-7791b803c271ab303acfa5029b1847e1"
     notifyURL: http://localhost:8107/racoon/tasks/callbacks
+    notifyEmail:
     retry:
       maxAttempts: 3
       initialIntervalSec: 10

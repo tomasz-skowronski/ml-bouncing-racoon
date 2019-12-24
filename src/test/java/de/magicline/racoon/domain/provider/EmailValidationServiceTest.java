@@ -45,8 +45,16 @@ class EmailValidationServiceTest {
     @BeforeEach
     void setUp(@WiremockResolver.Wiremock WireMockServer server, @WiremockUriResolver.WiremockUri String mockUri) {
         String apiKey = "ev-7791b803c271ab303acfa5029b1847e1";
-        String notifyURL = "https://racoon.free.beeceptor.com/";
-        providerConfiguration = new ProviderConfiguration(mockUri, mockUri, mockUri, apiKey, notifyURL, 2, 1);
+        String unused = "unused";
+        providerConfiguration = new ProviderConfiguration(
+                mockUri,
+                mockUri,
+                mockUri,
+                unused,
+                apiKey,
+                unused,
+                2,
+                1);
         RTEVValidationClient validationClient = providerConfiguration.rtevValidationClient();
         this.service = new EmailValidationService(
                 providerConfiguration,

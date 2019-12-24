@@ -44,10 +44,19 @@ class MockServiceIT {
     @BeforeEach
     void setUp() {
         String uri = "http://localhost:" + port + "/racoon/mock";
-        ProviderConfiguration providerConfiguration = new ProviderConfiguration(uri, uri, uri, "unused", "unused", 1, 1);
-        RTEVValidationClient validationClient = providerConfiguration.rtevValidationClient();
-        this.testee = new EmailValidationService(providerConfiguration,
-                validationClient,
+        String unused = "unused";
+        ProviderConfiguration providerConfiguration = new ProviderConfiguration(
+                uri,
+                uri,
+                uri,
+                unused,
+                unused,
+                unused,
+                1,
+                1);
+        this.testee = new EmailValidationService(
+                providerConfiguration,
+                providerConfiguration.rtevValidationClient(),
                 RetryConfig.ofDefaults(),
                 new RowsParser(),
                 new DataValidator());

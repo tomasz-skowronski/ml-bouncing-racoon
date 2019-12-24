@@ -31,7 +31,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
@@ -53,9 +52,17 @@ class TaskCallbacksServiceIT {
     @Test
     void shouldPublishStatusMessageWhenTaskCompleted() throws IOException {
         RTEVRowValue row = new RTEVRowValue("email", STATUS.getCode(), "message");
-        given(validationClient
-                .downloadTaskResult(any(URI.class), eq(TASK_ID), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString(), anyString()))
-                .willReturn(toResponse(toCsv(RowValue.class, row)));
+        given(validationClient.downloadTaskResult(
+                any(URI.class),
+                eq(TASK_ID),
+                eq("download"),
+                eq("valid-nocatchall"),
+                eq("catchall"),
+                eq("invalid"),
+                eq("suspect"),
+                eq("indeterminate"),
+                eq("long"))
+        ).willReturn(toResponse(toCsv(RowValue.class, row)));
 
         testee.complete(TASK_ID);
 

@@ -66,7 +66,8 @@ public class EmailValidationService {
                 providerConfiguration.getUriAsync(),
                 providerConfiguration.getApiKey(),
                 String.join("\n", request.getEmails()),
-                providerConfiguration.getNotifyURL()
+                providerConfiguration.getNotifyURL(),
+                providerConfiguration.getNotifyEmail()
         );
         return dataValidator.validateResponse(result);
     }
@@ -86,8 +87,7 @@ public class EmailValidationService {
                 "invalid",
                 "suspect",
                 "indeterminate",
-                "long",
-                "submit"
+                "long"
         );
         dataValidator.validateResponse(response);
         try {
