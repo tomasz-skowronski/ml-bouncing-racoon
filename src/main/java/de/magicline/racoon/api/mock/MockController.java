@@ -39,9 +39,10 @@ public class MockController {
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RTEVStatusAware> verify(@RequestParam(defaultValue = "0.2") BigDecimal correct,
+                                                  @RequestParam(defaultValue = "tenant1") String tenant,
                                                   @RequestParam Map<String, String> params) {
         if (isAsyncExpected(params)) {
-            return ResponseEntity.accepted().body(verifyAsync(params, correct));
+            return ResponseEntity.accepted().body(verifyAsync(params, correct, tenant));
         } else {
             return ResponseEntity.ok(verifySync(params));
         }
@@ -59,9 +60,9 @@ public class MockController {
         return emailAddress;
     }
 
-    private RTEVAsyncResult verifyAsync(Map<String, String> params, BigDecimal correct) {
+    private RTEVAsyncResult verifyAsync(Map<String, String> params, BigDecimal correct, String tenant) {
         List<String> emails = Arrays.asList(getEmails(params).split(DELIMITER));
-        return mockService.validate(emails, correct);
+        return mockService.validate(emails, correct, tenant);
     }
 
     private RTEVResult verifySync(@RequestParam Map<String, String> params) {

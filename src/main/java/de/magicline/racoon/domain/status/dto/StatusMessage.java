@@ -10,18 +10,24 @@ import com.google.common.base.MoreObjects;
 public class StatusMessage {
 
     private final String taskId;
+    private final String tenant;
     private final ValidationStatusDto status;
     private final List<StatusItem> items;
 
-    @ConstructorProperties({"taskId", "status", "items"})
-    public StatusMessage(String taskId, ValidationStatusDto status, List<StatusItem> items) {
+    @ConstructorProperties({"taskId", "tenant", "status", "items"})
+    public StatusMessage(String taskId, String tenant, ValidationStatusDto status, List<StatusItem> items) {
         this.taskId = taskId;
+        this.tenant = tenant;
         this.status = status;
         this.items = items;
     }
 
     public String getTaskId() {
         return taskId;
+    }
+
+    public String getTenant() {
+        return tenant;
     }
 
     public ValidationStatus getStatus() {

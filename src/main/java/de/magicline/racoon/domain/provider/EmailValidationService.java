@@ -6,14 +6,15 @@ import de.magicline.racoon.config.ProviderConfiguration;
 import de.magicline.racoon.config.RacoonMetrics;
 import de.magicline.racoon.domain.provider.dto.RTEVAsyncResult;
 import de.magicline.racoon.domain.provider.dto.RTEVResult;
+import de.magicline.racoon.domain.provider.dto.ValidationResult;
 import de.magicline.racoon.domain.task.dto.RowValue;
-import de.magicline.racoon.domain.task.dto.TaskResult;
 import feign.Response;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
 import javax.annotation.PostConstruct;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -42,7 +43,7 @@ public class EmailValidationService {
     }
 
     @PostConstruct
-    void init(){
+    void init() {
         retry.getEventPublisher().onEvent(RacoonMetrics::incrementValidationRetry);
     }
 
@@ -66,9 +67,9 @@ public class EmailValidationService {
                 providerConfiguration.getUriAsync(),
                 providerConfiguration.getApiKey(),
                 String.join("\n", request.getEmails()),
+                new TaskName(request).generateName(),
                 providerConfiguration.getNotifyURL(),
-                providerConfiguration.getNotifyEmail()
-        );
+                providerConfiguration.getNotifyEmail());
         return dataValidator.validateResponse(result);
     }
 
@@ -76,7 +77,7 @@ public class EmailValidationService {
      * @param taskId an unique identifier
      * @return CSV from https://www.email-validator.net/download.html
      */
-    public TaskResult downloadTaskResult(String taskId) {
+    public ValidationResult downloadValidationResult(String taskId) {
         dataValidator.validateNotBlank(taskId);
         Response response = validationClient.downloadTaskResult(
                 providerConfiguration.getUriDownload(),
@@ -87,17 +88,16 @@ public class EmailValidationService {
                 "invalid",
                 "suspect",
                 "indeterminate",
-                "long"
-        );
+                "long");
+        return new ValidationResult(read(response));
+    }
+
+    private List<RowValue> read(Response response) {
         dataValidator.validateResponse(response);
-        try {
-            return new TaskResult(taskId, parseBody(response));
+        try (InputStream is = response.body().asInputStream()) {
+            return rowsParser.parse(is);
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "unparsable", e);
         }
-    }
-
-    private List<RowValue> parseBody(Response response) throws IOException {
-        return rowsParser.parse(response.body().asInputStream());
     }
 }

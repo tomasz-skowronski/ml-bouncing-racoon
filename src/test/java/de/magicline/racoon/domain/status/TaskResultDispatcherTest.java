@@ -2,6 +2,7 @@ package de.magicline.racoon.domain.status;
 
 import de.magicline.racoon.domain.provider.dto.RTEVRowValue;
 import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
+import de.magicline.racoon.domain.provider.dto.ValidationResult;
 import de.magicline.racoon.domain.status.dto.ValidationStatus;
 import de.magicline.racoon.domain.task.dto.TaskResult;
 import de.magicline.racoon.domain.task.dto.ValidatedEmail;
@@ -22,9 +23,10 @@ class TaskResultDispatcherTest {
 
     @Test
     void dispatchInvalid() {
-        TaskResult taskResult = new TaskResult("id", List.of(
+        ValidationResult validationResult = new ValidationResult(List.of(
                 new RTEVRowValue("a", RTEVValidationStatus.INVALID_ADDRESS_UNAVAILABLE.getCode(), "m"),
                 new RTEVRowValue("b", RTEVValidationStatus.INVALID_ADDRESS_REJECTED.getCode(), "m")));
+        TaskResult taskResult = new TaskResult("id", "tenant", validationResult);
 
         Map<ValidationStatus, List<ValidatedEmail>> result = testee.dispatch(taskResult);
 
@@ -35,11 +37,12 @@ class TaskResultDispatcherTest {
 
     @Test
     void dispatchValid() {
-        TaskResult taskResult = new TaskResult("id", List.of(
+        ValidationResult validationResult = new ValidationResult(List.of(
                 new RTEVRowValue("a", RTEVValidationStatus.OK_VALID_ADDRESS.getCode(), "m"),
                 new RTEVRowValue("b", RTEVValidationStatus.OK_CATCH_ALL_ACTIVE.getCode(), "m"),
                 new RTEVRowValue("c", RTEVValidationStatus.OK_CATCH_ALL_TEST_DELAYED.getCode(), "m"),
                 new RTEVRowValue("d", RTEVValidationStatus.OK_CATCH_ALL_TEST_DELAYED.getCode(), "m")));
+        TaskResult taskResult = new TaskResult("id", "tenant", validationResult);
 
         Map<ValidationStatus, List<ValidatedEmail>> result = testee.dispatch(taskResult);
 

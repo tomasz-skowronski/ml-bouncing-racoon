@@ -2,6 +2,7 @@ package de.magicline.racoon.domain.status;
 
 import de.magicline.racoon.domain.provider.dto.RTEVRowValue;
 import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
+import de.magicline.racoon.domain.provider.dto.ValidationResult;
 import de.magicline.racoon.domain.status.dto.StatusItem;
 import de.magicline.racoon.domain.status.dto.StatusMessage;
 import de.magicline.racoon.domain.status.dto.ValidationStatusDto;
@@ -50,8 +51,9 @@ class StatusPublisherTest {
 
     @Test
     void publishToOneRouting() {
-        TaskResult taskResult = new TaskResult("id", List.of(
+        ValidationResult validationResult = new ValidationResult(List.of(
                 new RTEVRowValue("a", RTEVValidationStatus.ADDRESS_UNAVAILABLE.getCode(), "m")));
+        TaskResult taskResult = new TaskResult("id", "tenant", validationResult);
 
         testee.publishStatusMessages(taskResult);
 
@@ -61,9 +63,10 @@ class StatusPublisherTest {
 
     @Test
     void publishToTwoRoutings() {
-        TaskResult taskResult = new TaskResult("id", List.of(
+        ValidationResult validationResult = new ValidationResult(List.of(
                 new RTEVRowValue("c", RTEVValidationStatus.SERVER_UNAVAILABLE.getCode(), "m"),
                 new RTEVRowValue("d", RTEVValidationStatus.INVALID_ADDRESS_REJECTED.getCode(), "m")));
+        TaskResult taskResult = new TaskResult("id", "tenant", validationResult);
 
         testee.publishStatusMessages(taskResult);
 
@@ -90,10 +93,11 @@ class StatusPublisherTest {
     @Test
     @SuppressWarnings("unchecked")
     void publishMorePartitions() {
-        TaskResult taskResult = new TaskResult("id", List.of(
+        ValidationResult validationResult = new ValidationResult(List.of(
                 new RTEVRowValue("a", RTEVValidationStatus.SERVER_UNAVAILABLE.getCode(), "m"),
                 new RTEVRowValue("b", RTEVValidationStatus.SERVER_UNAVAILABLE.getCode(), "m"),
                 new RTEVRowValue("c", RTEVValidationStatus.SERVER_UNAVAILABLE.getCode(), "m")));
+        TaskResult taskResult = new TaskResult("id", "tenant", validationResult);
 
         testee.publishStatusMessages(taskResult);
 

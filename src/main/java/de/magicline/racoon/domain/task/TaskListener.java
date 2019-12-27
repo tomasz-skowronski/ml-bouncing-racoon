@@ -1,7 +1,6 @@
 package de.magicline.racoon.domain.task;
 
 import de.magicline.racoon.config.RabbitConfiguration;
-import de.magicline.racoon.domain.provider.EmailValidationService;
 import de.magicline.racoon.domain.status.StatusPublisher;
 import de.magicline.racoon.domain.task.dto.TaskResult;
 
@@ -16,11 +15,11 @@ public class TaskListener {
 
     private static final Logger LOGGER = LogManager.getLogger(TaskListener.class);
 
-    private final EmailValidationService emailValidationService;
+    private final TasksDownloader tasksDownloader;
     private final StatusPublisher statusPublisher;
 
-    public TaskListener(EmailValidationService emailValidationService1, StatusPublisher statusPublisher) {
-        this.emailValidationService = emailValidationService1;
+    public TaskListener(TasksDownloader tasksDownloader, StatusPublisher statusPublisher) {
+        this.tasksDownloader = tasksDownloader;
         this.statusPublisher = statusPublisher;
     }
 
@@ -28,7 +27,7 @@ public class TaskListener {
     public void onTaskCompleted(String taskId) {
         LOGGER.info("onTaskCompleted: {} ", taskId);
         try {
-            TaskResult taskResult = emailValidationService.downloadTaskResult(taskId);
+            TaskResult taskResult = tasksDownloader.downloadTaskResult(taskId);
             statusPublisher.publishStatusMessages(taskResult);
         } catch (Exception e) {
             LOGGER.error("onTaskCompleted FAILED: {}", taskId, e);

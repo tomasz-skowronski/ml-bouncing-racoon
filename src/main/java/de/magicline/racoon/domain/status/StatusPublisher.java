@@ -10,16 +10,19 @@ import de.magicline.racoon.domain.task.dto.TaskResult;
 import de.magicline.racoon.domain.task.dto.ValidatedEmail;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.ListUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 public class StatusPublisher {
+
+    private static final Logger LOGGER = LogManager.getLogger(StatusPublisher.class);
 
     private final TaskResultDispatcher dispatcher;
     private final RabbitTemplate rabbitTemplate;
@@ -34,10 +37,15 @@ public class StatusPublisher {
     }
 
     public void publishStatusMessages(TaskResult taskResult) {
-        Map<ValidationStatus, List<ValidatedEmail>> byStatusType = dispatcher.dispatch(taskResult);
-        byStatusType.forEach((status, emails) ->
-                partition(emails).forEach(batch ->
-                        sendToMQ(taskResult.getTaskId(), status, batch)));
+        dispatcher.dispatch(taskResult).forEach((status, emails) ->
+                partition(emails).forEach(batch -> {
+                    StatusMessage statusMessage = new StatusMessage(
+                            taskResult.getTaskId(),
+                            taskResult.getTenant(),
+                            new ValidationStatusDto(status),
+                            batch);
+                    sendToMQ(statusMessage, status);
+                }));
     }
 
     private List<List<StatusItem>> partition(List<ValidatedEmail> emails) {
@@ -47,11 +55,12 @@ public class StatusPublisher {
         return ListUtils.partition(items, batchSize);
     }
 
-    private void sendToMQ(String taskId, ValidationStatus status, List<StatusItem> statusItems) {
+    private void sendToMQ(StatusMessage statusMessage, ValidationStatus status) {
         RTEVValidationStatus.Type type = RTEVValidationStatus.Type.valueOf(status.getType());
+        LOGGER.info("publish {}", statusMessage);
         rabbitTemplate.convertAndSend(
                 RabbitConfiguration.toStatusQueueName(type),
-                new StatusMessage(taskId, new ValidationStatusDto(status), statusItems));
+                statusMessage);
     }
 
 }

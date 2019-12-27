@@ -4,7 +4,6 @@ import de.magicline.racoon.api.dto.ValidateEmailsRequest;
 import de.magicline.racoon.config.ProviderConfiguration;
 import de.magicline.racoon.domain.provider.DataValidator;
 import de.magicline.racoon.domain.provider.EmailValidationService;
-import de.magicline.racoon.domain.provider.RTEVValidationClient;
 import de.magicline.racoon.domain.provider.RowsParser;
 import de.magicline.racoon.domain.provider.dto.RTEVAsyncResult;
 import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
@@ -65,7 +64,8 @@ class MockServiceIT {
     @Test
     void validateUsingMockAndRetrieveStatusMessage() throws InterruptedException {
         ValidateEmailsRequest request = new ValidateEmailsRequest(
-                List.of("1@a.pl", "2@a.pl", "3@a.pl", "4@a.pl", "5@a.pl"));
+                List.of("1@a.pl", "2@a.pl", "3@a.pl", "4@a.pl", "5@a.pl"),
+                "tenant");
         String taskId = "-392623883";
         count = new CountDownLatch(request.getEmails().size());
 
@@ -76,9 +76,11 @@ class MockServiceIT {
         assertThat(count.getCount()).isZero();
         assertThat(receivedSuspects).contains(
                 new StatusMessage(taskId,
+                        "tenant",
                         new ValidationStatusDto(RTEVValidationStatus.LOCAL_ADDRESS),
                         List.of(new StatusItem("2@a.pl"))),
                 new StatusMessage(taskId,
+                        "tenant",
                         new ValidationStatusDto(RTEVValidationStatus.DISPOSABLE_ADDRESS),
                         List.of(new StatusItem("5@a.pl")))
         );

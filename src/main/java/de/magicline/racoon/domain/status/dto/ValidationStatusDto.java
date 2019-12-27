@@ -17,7 +17,7 @@ public class ValidationStatusDto implements ValidationStatus {
         this(status.getType(), status.getCode(), status.isRetry(), status.getDescription());
     }
 
-    @ConstructorProperties({"typeId", "code", "retry", "description"})
+    @ConstructorProperties({"type", "code", "retry", "description"})
     public ValidationStatusDto(String type, int code, boolean retry, String description) {
         this.type = type;
         this.code = code;

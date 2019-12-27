@@ -18,8 +18,7 @@
 
 http://docs.aws.amazon.com/ses/latest/DeveloperGuide/best-practices-bounces-complaints.html
 
-![](/doc/context.png)
-[context.plantuml](/doc/context.plantuml)
+![](/doc/context.png) [context.plantuml](/doc/context.plantuml)
 
 ## Local development
 
@@ -32,20 +31,19 @@ Alternatively you can use the following command to run all containers:
 
 `(cd ~/src/ml-bouncing-racoon/docker && docker-compose -f docker-compose-run-all.yaml up -d)`
 
-### Code structure
+### Code packages
 
 * de.magicline.racoon.api
 * de.magicline.racoon.config
 * de.magicline.racoon.domain (provider, task, status)
 
-![](/doc/packages.png)
-[packages.plantuml](/doc/packages.plantuml)
+![](/doc/packages.png) [packages.plantuml](/doc/packages.plantuml)
 
 ### Tests
 
-* unit: *Test.java)
+* unit: *Test.java
 * integration: *IT.java
-* web: *.http (IntelliJ)
+* web: *.http (for IntelliJ)
 
 Known issues: 
 
@@ -96,7 +94,16 @@ https://www.email-validator.net/api.html
 * All validation task data will be automatically deleted 14 days after the data has been made available.
 * The email validator service caches results for several days, so if an email tested as bad, it will continue to show up as bad for a few days until it is re-evaluated. 
 
-> IMPORTANT: Email addresses marked with `OK - Catch-All Active` 
+#### Validation Status
+
+There are 3 statues of type VALID.
+Only 200 status means that address **is valid**. Use it for *strict* validation.
+207 and 215 statuses mean that addresses **aren't invalid**. You can use them for *non-strict* validation.
+
+There are also INDETERMINATE, SUSPECT and INVALID [types of status](https://www.email-validator.net/results.html).
+At the end of validation process `StatusMessage`s are sent to proper queue eg. `ml.racoon.status.invalid` depending on type.   
+
+> IMPORTANT: Email addresses marked with `OK - Catch-All Active` (207) 
 can still bounce as some mail servers accept mail for any address and create a non-delivery-report later. 
 If you are using an external service like MailChimp to send out your emails and want to be absolutely sure 
 that all email addresses on your list really exist and are deliverable, 
@@ -118,8 +125,7 @@ we strongly recommend that you use only addresses with a `OK - Valid Address` (2
 
 #### Asynchronous Bulk API
 
-![](/doc/sequence.png)
-[sequence.plantuml](/doc/sequence.plantuml)
+![](/doc/sequence.png) [sequence.plantuml](/doc/sequence.plantuml)
 
 Racoon sends a request and receive a callback by email (NotifyEmail) or HTTP (NotifyURL) when processing is complete.
 

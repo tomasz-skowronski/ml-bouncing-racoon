@@ -20,7 +20,8 @@ public class TaskResultDispatcher {
 
     @SuppressWarnings("squid:S3864")
     Map<ValidationStatus, List<ValidatedEmail>> dispatch(TaskResult taskResult) {
-        Map<ValidationStatus, List<ValidatedEmail>> byStatus = taskResult.getRows()
+        Map<ValidationStatus, List<ValidatedEmail>> byStatus = taskResult.getResult()
+                .getRows()
                 .stream()
                 .peek(r -> RacoonMetrics.incrementValidationStatus(r.getResult()))
                 .map(r -> new ValidatedEmail(r.getEmail(), r.getResult()))

@@ -1,10 +1,10 @@
 package de.magicline.racoon.api;
 
-import de.magicline.racoon.domain.provider.EmailValidationService;
 import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
 import de.magicline.racoon.domain.status.dto.ValidationStatus;
 import de.magicline.racoon.domain.status.dto.ValidationStatusDto;
 import de.magicline.racoon.domain.task.TaskCallbacksService;
+import de.magicline.racoon.domain.task.TasksDownloader;
 import de.magicline.racoon.domain.task.dto.TaskResult;
 
 import java.util.Arrays;
@@ -25,11 +25,11 @@ import com.google.common.annotations.VisibleForTesting;
 public class TasksController {
 
     private final TaskCallbacksService tasksCallbacksService;
-    private final EmailValidationService emailValidationService;
+    private final TasksDownloader tasksDownloader;
 
-    public TasksController(TaskCallbacksService tasksCallbacksService, EmailValidationService emailValidationService) {
+    public TasksController(TaskCallbacksService tasksCallbacksService, TasksDownloader tasksDownloader) {
         this.tasksCallbacksService = tasksCallbacksService;
-        this.emailValidationService = emailValidationService;
+        this.tasksDownloader = tasksDownloader;
     }
 
     @VisibleForTesting
@@ -42,7 +42,7 @@ public class TasksController {
     @VisibleForTesting
     @GetMapping("/{taskId}")
     public TaskResult getTaskResult(@PathVariable String taskId) {
-        return emailValidationService.downloadTaskResult(taskId);
+        return tasksDownloader.downloadTaskResult(taskId);
     }
 
     @GetMapping("/statuses")

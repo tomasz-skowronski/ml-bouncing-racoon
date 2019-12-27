@@ -4,6 +4,7 @@ import de.magicline.racoon.domain.provider.dto.RTEVAsyncResult;
 import de.magicline.racoon.domain.provider.dto.RTEVResult;
 import de.magicline.racoon.domain.provider.dto.RTEVRowValue;
 import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
+import de.magicline.racoon.domain.provider.dto.ValidationResult;
 import de.magicline.racoon.domain.status.StatusPublisher;
 import de.magicline.racoon.domain.task.dto.RowValue;
 import de.magicline.racoon.domain.task.dto.TaskResult;
@@ -29,15 +30,15 @@ public class MockService {
         return new RTEVResult(toStatus(email, 0));
     }
 
-    RTEVAsyncResult validate(List<String> emails, BigDecimal correct) {
+    RTEVAsyncResult validate(List<String> emails, BigDecimal correct, String tenant) {
         AtomicInteger correctness = createCorrectnessCounter(emails, correct);
         String taskId = String.valueOf(emails.hashCode());
-        List<RowValue> rows = toRowValues(emails, correctness);
-        statusPublisher.publishStatusMessages(new TaskResult(taskId, rows));
+        ValidationResult result = new ValidationResult(toRows(emails, correctness));
+        statusPublisher.publishStatusMessages(new TaskResult(taskId, tenant, result));
         return new RTEVAsyncResult(RTEVValidationStatus.TASK_ACCEPTED.getCode(), taskId);
     }
 
-    private List<RowValue> toRowValues(List<String> emails, AtomicInteger correctness) {
+    private List<RowValue> toRows(List<String> emails, AtomicInteger correctness) {
         return emails.stream()
                 .map(e -> {
                     int status = toStatus(e, correctness.getAndDecrement()).getCode();

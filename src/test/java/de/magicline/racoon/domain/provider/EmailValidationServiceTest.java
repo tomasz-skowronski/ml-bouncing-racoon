@@ -6,7 +6,7 @@ import de.magicline.racoon.config.ProviderConfiguration;
 import de.magicline.racoon.domain.provider.dto.RTEVAsyncResult;
 import de.magicline.racoon.domain.provider.dto.RTEVResult;
 import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
-import de.magicline.racoon.domain.task.dto.TaskResult;
+import de.magicline.racoon.domain.provider.dto.ValidationResult;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 import ru.lanwen.wiremock.ext.WiremockUriResolver;
 
@@ -101,7 +101,7 @@ class EmailValidationServiceTest {
 
         String taskId = "x5-2a6a7d199cc47698f6b8d1cc4995d71d";
         List<String> emails = List.of("a@a.pl", "info@magicline.de");
-        ValidateEmailsRequest request = new ValidateEmailsRequest(emails);
+        ValidateEmailsRequest request = new ValidateEmailsRequest(emails, "tenant");
 
         @Test
         void success() throws JsonProcessingException {
@@ -145,10 +145,9 @@ class EmailValidationServiceTest {
                         .withHeader(CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE)
                 ));
 
-                TaskResult report = service.downloadTaskResult(taskId);
+                ValidationResult result = service.downloadValidationResult(taskId);
 
-                assertThat(report.getTaskId()).isEqualTo(taskId);
-                assertThat(report.getRows()).hasSize(2);
+                assertThat(result.getRows()).hasSize(2);
                 server.verify(postRequestedFor(urlPathEqualTo("/download.html"))
                         .withHeader(CONTENT_TYPE, containing(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
                         .withRequestBody(hasFormParam("id", taskId))
@@ -163,7 +162,7 @@ class EmailValidationServiceTest {
                         .withHeader(CONTENT_TYPE, MediaType.TEXT_HTML_VALUE)
                 ));
 
-                assertThatThrownBy(() -> service.downloadTaskResult(taskId))
+                assertThatThrownBy(() -> service.downloadValidationResult(taskId))
                         .isInstanceOf(ResponseStatusException.class)
                         .hasMessageStartingWith("503 SERVICE_UNAVAILABLE \"text/html\"");
                 server.verify(postRequestedFor(urlPathEqualTo("/download.html")));
@@ -174,7 +173,7 @@ class EmailValidationServiceTest {
                 String taskId = "invalid-or-not-completed-task-id";
                 server.stubFor(post("/download.html").willReturn(serviceUnavailable()));
 
-                assertThatThrownBy(() -> service.downloadTaskResult(taskId))
+                assertThatThrownBy(() -> service.downloadValidationResult(taskId))
                         .isInstanceOf(ResponseStatusException.class)
                         .hasMessageStartingWith("503 SERVICE_UNAVAILABLE");
                 server.verify(postRequestedFor(urlPathEqualTo("/download.html")));
