@@ -18,6 +18,9 @@
 
 http://docs.aws.amazon.com/ses/latest/DeveloperGuide/best-practices-bounces-complaints.html
 
+![](/doc/context.png)
+[context.plantuml](/doc/context.plantuml)
+
 ## Local development
 
 You can start the required Docker containers with the following command:
@@ -48,7 +51,7 @@ Known issues:
 
 * `@MockBean`/`@TestConfiguration` doesn't work when run all tests. Workaround: `@DirtiesContext` for other IT.
 
-## Database
+## Database (WIP)
 
 Access to the DEV and Stage database is via the Jump Server:
 
@@ -71,7 +74,7 @@ Access to the DEV and Stage database is via the Jump Server:
 
 RTEV callbacks `GET /racoon/tasks/callbacks?taskid=<taskId>`
 
-### Swagger
+### Swagger (WIP)
 * [LOCAL](http://localhost:8107/swagger-ui.html)
 * [DEV](https://bouncing-racoon.dev.magicline.com/swagger-ui.html)
 * [STAGE](https://bouncing-racoon.stage.magicline.com/swagger-ui.html)

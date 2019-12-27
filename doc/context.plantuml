@@ -1,0 +1,22 @@
+@startuml
+left to right direction
+
+package "Magicline" {
+    agent "ml-backend" as MLB
+    boundary "ml-external-api" as API
+    agent "ml-bouncing-racoon" as BR
+    queue RabbitMQ as MQ
+}
+
+cloud "AWS SES" as SES
+actor "email-validator.net (RTEV)" as RTEV
+
+MLB -left-> SES
+MLB --> BR
+BR --> RTEV
+RTEV --> API
+API -right-> MQ
+MQ --> BR
+BR --> MQ
+MQ --> MLB
+@enduml

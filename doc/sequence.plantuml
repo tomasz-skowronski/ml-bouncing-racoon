@@ -1,15 +1,16 @@
 @startuml
-actor client
-boundary "ml-external-api"
-actor "email-validator.net (RTEV)" as RTEV
+participant "ml-backend" as MLB
+participant "ml-bouncing-racoon" as BR
+actor "email-validator.net" as RTEV
+boundary "ml-external-api" as API
 
-client -> Raccoon : validate e-mails
-Raccoon -> RTEV : POST api/verify
-RTEV -> "ml-external-api" : callback
-"ml-external-api" ->o Raccoon : taskId
-Raccoon -> RTEV : POST /download.html
-Raccoon -> Raccoon : taskResult
-Raccoon ->o client : statusMessage
+MLB -> BR : validate e-mails
+BR -> RTEV : POST api/verify
+RTEV -> API : callback
+API -> BR : taskId
+BR -> RTEV : POST /download.html
+BR -> BR : taskResult
+BR -> MLB : statusMessage
 ...
-Raccoon ->o client : statusMessage
+BR -> MLB : statusMessage
 @enduml
