@@ -6,6 +6,7 @@ package "Magicline" {
     boundary "ml-external-api" as API
     agent "ml-bouncing-racoon" as BR
     queue RabbitMQ as MQ
+    database racoon as DB
 }
 
 cloud "AWS SES" as SES
@@ -14,6 +15,7 @@ actor "email-validator.net (RTEV)" as RTEV
 MLB -left-> SES
 MLB --> BR
 BR --> RTEV
+BR -left- DB
 RTEV --> API
 API -right-> MQ
 MQ --> BR

@@ -57,8 +57,8 @@ public class StatusMessage {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("taskId", taskId)
-                .add("status", status)
                 .add("items", items != null ? items.size() : null)
+                .add("status", status)
                 .toString();
     }
 }

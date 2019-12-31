@@ -31,11 +31,6 @@ public class TaskResultFetcher {
         this.clock = clock;
     }
 
-    @Transactional(readOnly = true)
-    public Optional<Task> findByTaskId(String taskId) {
-        return taskRepository.findByTaskId(taskId);
-    }
-
     @Transactional
     public TaskResult fetchByTaskId(String taskId) {
         ValidationResult validationResult = emailValidationService.downloadValidationResult(taskId);

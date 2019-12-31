@@ -35,6 +35,10 @@ public final class RacoonMetrics {
                 .record(duration);
     }
 
+    public static void uncompletedTasks(long uncompleted) {
+        Metrics.gauge("racoon.tasks.uncompleted", uncompleted);
+    }
+
     public static void incrementValidationRetry(RetryEvent count) {
         Metrics.counter("racoon.validation.retry",
                 "event", count.getClass().getSimpleName()

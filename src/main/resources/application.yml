@@ -49,10 +49,14 @@ app:
     retry:
       maxAttempts: 3
       initialIntervalSec: 10
-
   task:
     status:
       batch: 100
+
+  job.delay:
+      # https://www.logicbig.com/how-to/code-snippets/jcode-java-8-date-time-api-duration-parse.html
+      metrics: "PT1H" # TIME 1 HOUR
+      cleanup: "P1D" # 1 DAY
 
 logging:
   config:

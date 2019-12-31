@@ -17,7 +17,7 @@ class TaskName {
     }
 
     String generate(Clock clock) {
-        return String.join(":",
+        return String.join("_",
                 tenant,
                 String.valueOf(size),
                 format(LocalDateTime.now(clock)));
