@@ -1,6 +1,7 @@
 package de.magicline.racoon.domain.task;
 
 import de.magicline.racoon.api.dto.ValidateEmailsRequest;
+import de.magicline.racoon.common.TestClock;
 import de.magicline.racoon.config.ProviderConfiguration;
 import de.magicline.racoon.domain.provider.DataValidator;
 import de.magicline.racoon.domain.provider.EmailValidationService;
@@ -10,8 +11,11 @@ import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
 import de.magicline.racoon.domain.status.dto.StatusItem;
 import de.magicline.racoon.domain.status.dto.StatusMessage;
 import de.magicline.racoon.domain.status.dto.ValidationStatusDto;
+import de.magicline.racoon.domain.task.dto.Task;
+import de.magicline.racoon.domain.task.persistance.TaskRepository;
 import io.github.resilience4j.retry.RetryConfig;
 
+import java.time.Clock;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
@@ -23,10 +27,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.then;
 
 @DirtiesContext
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -39,6 +46,9 @@ class MockServiceIT {
     private int port;
     private final ConcurrentLinkedQueue<StatusMessage> receivedSuspects = new ConcurrentLinkedQueue<>();
     private CountDownLatch count;
+    @MockBean
+    private TaskRepository taskRepository;
+    private Clock clock = new TestClock();
 
     @BeforeEach
     void setUp() {
@@ -58,7 +68,9 @@ class MockServiceIT {
                 providerConfiguration.rtevValidationClient(),
                 RetryConfig.ofDefaults(),
                 new RowsParser(),
-                new DataValidator());
+                new DataValidator(),
+                taskRepository,
+                clock);
     }
 
     @Test
@@ -84,6 +96,7 @@ class MockServiceIT {
                         new ValidationStatusDto(RTEVValidationStatus.DISPOSABLE_ADDRESS),
                         List.of(new StatusItem("5@a.pl")))
         );
+        then(taskRepository).should().insert(any(Task.class));
     }
 
     @RabbitListener(queues = "ml.racoon.status.suspect")

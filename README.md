@@ -18,7 +18,8 @@
 
 http://docs.aws.amazon.com/ses/latest/DeveloperGuide/best-practices-bounces-complaints.html
 
-![](/doc/context.png) [context.plantuml](/doc/context.plantuml)
+![](/doc/context.png)
+[context.plantuml](/doc/context.plantuml)
 
 ## Local development
 
@@ -37,7 +38,8 @@ Alternatively you can use the following command to run all containers:
 * de.magicline.racoon.config
 * de.magicline.racoon.domain (provider, task, status)
 
-![](/doc/packages.png) [packages.plantuml](/doc/packages.plantuml)
+![](/doc/packages.png)
+[packages.plantuml](/doc/packages.plantuml)
 
 ### Tests
 
@@ -125,7 +127,8 @@ we strongly recommend that you use only addresses with a `OK - Valid Address` (2
 
 #### Asynchronous Bulk API
 
-![](/doc/sequence.png) [sequence.plantuml](/doc/sequence.plantuml)
+![](/doc/sequence.png)
+[sequence.plantuml](/doc/sequence.plantuml)
 
 Racoon sends a request and receive a callback by email (NotifyEmail) or HTTP (NotifyURL) when processing is complete.
 

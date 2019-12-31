@@ -15,11 +15,11 @@ public class TaskListener {
 
     private static final Logger LOGGER = LogManager.getLogger(TaskListener.class);
 
-    private final TasksDownloader tasksDownloader;
+    private final TaskResultFetcher taskResultFetcher;
     private final StatusPublisher statusPublisher;
 
-    public TaskListener(TasksDownloader tasksDownloader, StatusPublisher statusPublisher) {
-        this.tasksDownloader = tasksDownloader;
+    public TaskListener(TaskResultFetcher taskResultFetcher, StatusPublisher statusPublisher) {
+        this.taskResultFetcher = taskResultFetcher;
         this.statusPublisher = statusPublisher;
     }
 
@@ -27,7 +27,7 @@ public class TaskListener {
     public void onTaskCompleted(String taskId) {
         LOGGER.info("onTaskCompleted: {} ", taskId);
         try {
-            TaskResult taskResult = tasksDownloader.downloadTaskResult(taskId);
+            TaskResult taskResult = taskResultFetcher.fetchByTaskId(taskId);
             statusPublisher.publishStatusMessages(taskResult);
         } catch (Exception e) {
             LOGGER.error("onTaskCompleted FAILED: {}", taskId, e);

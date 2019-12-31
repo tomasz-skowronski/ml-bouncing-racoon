@@ -2,20 +2,26 @@ package de.magicline.racoon.domain.provider;
 
 import de.magicline.racoon.api.dto.ValidateEmailRequest;
 import de.magicline.racoon.api.dto.ValidateEmailsRequest;
+import de.magicline.racoon.common.TestClock;
 import de.magicline.racoon.config.ProviderConfiguration;
 import de.magicline.racoon.domain.provider.dto.RTEVAsyncResult;
 import de.magicline.racoon.domain.provider.dto.RTEVResult;
 import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
 import de.magicline.racoon.domain.provider.dto.ValidationResult;
+import de.magicline.racoon.domain.task.dto.Task;
+import de.magicline.racoon.domain.task.persistance.TaskRepository;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 import ru.lanwen.wiremock.ext.WiremockUriResolver;
 
+import java.time.Clock;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,14 +39,19 @@ import static de.magicline.racoon.common.HttpHelper.hasFormParam;
 import static de.magicline.racoon.common.SerializationHelper.toJson;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.then;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
-@ExtendWith({WiremockResolver.class, WiremockUriResolver.class})
+@ExtendWith({MockitoExtension.class, WiremockResolver.class, WiremockUriResolver.class})
 class EmailValidationServiceTest {
 
     private WireMockServer server;
     private EmailValidationService service;
     private ProviderConfiguration providerConfiguration;
+    @Mock
+    private TaskRepository taskRepository;
+    private Clock clock = new TestClock();
 
     @BeforeEach
     void setUp(@WiremockResolver.Wiremock WireMockServer server, @WiremockUriResolver.WiremockUri String mockUri) {
@@ -60,7 +71,10 @@ class EmailValidationServiceTest {
                 providerConfiguration,
                 validationClient,
                 providerConfiguration.retryConfig(),
-                new RowsParser(), new DataValidator());
+                new RowsParser(),
+                new DataValidator(),
+                taskRepository,
+                clock);
         this.server = server;
     }
 
@@ -117,6 +131,7 @@ class EmailValidationServiceTest {
                     .withRequestBody(hasFormParam("EmailAddress", String.join("\n", emails)))
                     .withRequestBody(hasFormParam("APIKey", providerConfiguration.getApiKey()))
             );
+            then(taskRepository).should().insert(any(Task.class));
         }
 
         @Test
@@ -127,6 +142,7 @@ class EmailValidationServiceTest {
                     .isInstanceOf(ResponseStatusException.class)
                     .hasMessage("503 SERVICE_UNAVAILABLE \"...\"");
             server.verify(postRequestedFor(urlPathEqualTo("/api/verify")));
+            then(taskRepository).shouldHaveNoInteractions();
         }
 
         @Nested

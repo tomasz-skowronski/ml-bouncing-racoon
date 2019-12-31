@@ -3,6 +3,8 @@ package de.magicline.racoon.config;
 import io.github.resilience4j.retry.event.RetryEvent;
 import io.micrometer.core.instrument.Metrics;
 
+import java.time.Duration;
+
 import org.springframework.http.HttpStatus;
 
 public final class RacoonMetrics {
@@ -26,6 +28,11 @@ public final class RacoonMetrics {
     public static void incrementValidations(int count) {
         Metrics.counter("racoon.validations.quantity")
                 .increment(count);
+    }
+
+    public static void durationOfTask(Duration duration) {
+        Metrics.timer("racoon.tasks.duration")
+                .record(duration);
     }
 
     public static void incrementValidationRetry(RetryEvent count) {

@@ -8,6 +8,8 @@ import de.magicline.racoon.domain.provider.dto.RTEVAsyncResult;
 import de.magicline.racoon.domain.provider.dto.RTEVResult;
 import de.magicline.racoon.domain.provider.dto.ValidationResult;
 import de.magicline.racoon.domain.task.dto.RowValue;
+import de.magicline.racoon.domain.task.dto.Task;
+import de.magicline.racoon.domain.task.persistance.TaskRepository;
 import feign.Response;
 import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryConfig;
@@ -15,10 +17,12 @@ import javax.annotation.PostConstruct;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Clock;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -29,17 +33,22 @@ public class EmailValidationService {
     private final Retry retry;
     private final RowsParser rowsParser;
     private final DataValidator dataValidator;
+    private final TaskRepository taskRepository;
+    private final Clock clock;
 
     public EmailValidationService(ProviderConfiguration providerConfiguration,
                                   RTEVValidationClient validationClient,
                                   RetryConfig retryConfig,
                                   RowsParser rowsParser,
-                                  DataValidator dataValidator) {
+                                  DataValidator dataValidator,
+                                  TaskRepository taskRepository, Clock clock) {
         this.providerConfiguration = providerConfiguration;
         this.validationClient = validationClient;
         this.retry = Retry.of("rtev", retryConfig);
         this.rowsParser = rowsParser;
         this.dataValidator = dataValidator;
+        this.taskRepository = taskRepository;
+        this.clock = clock;
     }
 
     @PostConstruct
@@ -61,16 +70,24 @@ public class EmailValidationService {
         return dataValidator.validateResponse(result);
     }
 
+    @Transactional
     public RTEVAsyncResult validateEmailsAsync(ValidateEmailsRequest request) {
         dataValidator.validateRequest(request);
         RTEVAsyncResult result = validationClient.validateEmailsAsync(
                 providerConfiguration.getUriAsync(),
                 providerConfiguration.getApiKey(),
                 String.join("\n", request.getEmails()),
-                new TaskName(request).generateName(),
+                new TaskName(request).generate(clock),
                 providerConfiguration.getNotifyURL(),
                 providerConfiguration.getNotifyEmail());
-        return dataValidator.validateResponse(result);
+        dataValidator.validateResponse(result);
+        createTask(request, result);
+        return result;
+    }
+
+    private void createTask(ValidateEmailsRequest request, RTEVAsyncResult result) {
+        taskRepository.insert(
+                new Task(result.getInfo(), request.getTenant(), clock.instant()));
     }
 
     /**

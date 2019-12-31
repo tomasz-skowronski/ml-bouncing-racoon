@@ -1,18 +1,19 @@
-package de.magicline.racoon.common;
+package de.magicline.racoon.convention;
 
 import io.vavr.control.Try;
 
 import java.beans.ConstructorProperties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.tngtech.archunit.base.HasDescription;
 import com.tngtech.archunit.core.domain.JavaClassList;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaCodeUnit;
 import com.tngtech.archunit.core.domain.JavaConstructor;
-import com.tngtech.archunit.core.domain.JavaField;
+import com.tngtech.archunit.core.domain.JavaMember;
 import com.tngtech.archunit.core.domain.properties.HasSourceCodeLocation;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchCondition;
@@ -23,10 +24,10 @@ import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DtosCorrectnessTest {
+class DtosConventionsTest {
 
     @Test
-    public void correctParameters() {
+    void correctParameters() {
         JavaClasses classes = new ClassFileImporter().importPackages("de.magicline");
 
         ArchRule rule = ArchRuleDefinition.constructors()
@@ -42,10 +43,12 @@ public class DtosCorrectnessTest {
         return new ArchCondition<>("have correct fields") {
             @Override
             public void check(JavaConstructor item, ConditionEvents events) {
-                Set<JavaField> fields = item.getOwner().getAllFields();
+                Set<String> fields = item.getOwner().getAllFields().stream()
+                        .map(JavaMember::getName)
+                        .collect(Collectors.toSet());
                 String[] annotationParams = item.getAnnotationOfType(ConstructorProperties.class).value();
                 addEvent(item, events, Try.run(() ->
-                        assertThat(fields).extracting(JavaField::getName).containsExactlyInAnyOrder(annotationParams)));
+                        assertThat(annotationParams).containsExactlyInAnyOrderElementsOf(fields)));
             }
         };
     }
@@ -57,7 +60,7 @@ public class DtosCorrectnessTest {
                 JavaClassList constructorParams = item.getRawParameterTypes();
                 String[] annotationParams = item.getAnnotationOfType(ConstructorProperties.class).value();
                 addEvent(item, events, Try.run(() ->
-                        assertThat(constructorParams).hasSize(annotationParams.length)));
+                        assertThat(annotationParams).hasSize(constructorParams.size())));
             }
         };
     }

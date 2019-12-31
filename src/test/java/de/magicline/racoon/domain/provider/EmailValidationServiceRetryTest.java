@@ -1,9 +1,13 @@
 package de.magicline.racoon.domain.provider;
 
 import de.magicline.racoon.api.dto.ValidateEmailRequest;
+import de.magicline.racoon.common.TestClock;
 import de.magicline.racoon.config.ProviderConfiguration;
 import de.magicline.racoon.domain.provider.dto.RTEVResult;
 import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
+import de.magicline.racoon.domain.task.persistance.TaskRepository;
+
+import java.time.Clock;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +34,9 @@ class EmailValidationServiceRetryTest {
     private RTEVValidationClient validationClient;
     @Mock
     private RowsParser rowsParser;
+    @Mock
+    private TaskRepository taskRepository;
+    private Clock clock = new TestClock();
 
     @BeforeEach
     void setUp() {
@@ -37,7 +44,9 @@ class EmailValidationServiceRetryTest {
                 validationClient,
                 providerConfiguration.retryConfig(),
                 rowsParser,
-                dataValidator);
+                dataValidator,
+                taskRepository,
+                clock);
     }
 
     @Test

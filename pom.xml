@@ -21,6 +21,7 @@
         <dependency.version.assertj>3.13.2</dependency.version.assertj>
         <!-- override spring boot property for metrics version -->
         <dependency.version.prometheus.metrics>0.1.0</dependency.version.prometheus.metrics>
+        <dependency.version.jdbi>3.12.0</dependency.version.jdbi>
     </properties>
 
     <dependencyManagement>
@@ -80,6 +81,10 @@
             </exclusions>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
@@ -104,10 +109,6 @@
 
         <!--Database-->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
@@ -115,6 +116,21 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
             <version>5.2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jdbi</groupId>
+            <artifactId>jdbi3-spring4</artifactId>
+            <version>${dependency.version.jdbi}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jdbi</groupId>
+            <artifactId>jdbi3-sqlobject</artifactId>
+            <version>${dependency.version.jdbi}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jdbi</groupId>
+            <artifactId>jdbi3-core</artifactId>
+            <version>${dependency.version.jdbi}</version>
         </dependency>
 
         <!--Apache Commons-->

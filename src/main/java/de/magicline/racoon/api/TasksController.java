@@ -4,7 +4,8 @@ import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
 import de.magicline.racoon.domain.status.dto.ValidationStatus;
 import de.magicline.racoon.domain.status.dto.ValidationStatusDto;
 import de.magicline.racoon.domain.task.TaskCallbacksService;
-import de.magicline.racoon.domain.task.TasksDownloader;
+import de.magicline.racoon.domain.task.TaskResultFetcher;
+import de.magicline.racoon.domain.task.dto.Task;
 import de.magicline.racoon.domain.task.dto.TaskResult;
 
 import java.util.Arrays;
@@ -25,11 +26,11 @@ import com.google.common.annotations.VisibleForTesting;
 public class TasksController {
 
     private final TaskCallbacksService tasksCallbacksService;
-    private final TasksDownloader tasksDownloader;
+    private final TaskResultFetcher taskResultFetcher;
 
-    public TasksController(TaskCallbacksService tasksCallbacksService, TasksDownloader tasksDownloader) {
+    public TasksController(TaskCallbacksService tasksCallbacksService, TaskResultFetcher taskResultFetcher) {
         this.tasksCallbacksService = tasksCallbacksService;
-        this.tasksDownloader = tasksDownloader;
+        this.taskResultFetcher = taskResultFetcher;
     }
 
     @VisibleForTesting
@@ -41,8 +42,16 @@ public class TasksController {
 
     @VisibleForTesting
     @GetMapping("/{taskId}")
+    public ResponseEntity<Task> getTask(@PathVariable String taskId) {
+        return taskResultFetcher.findByTaskId(taskId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @VisibleForTesting
+    @GetMapping("/{taskId}/result")
     public TaskResult getTaskResult(@PathVariable String taskId) {
-        return tasksDownloader.downloadTaskResult(taskId);
+        return taskResultFetcher.fetchByTaskId(taskId);
     }
 
     @GetMapping("/statuses")

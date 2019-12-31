@@ -7,17 +7,22 @@ import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
 import de.magicline.racoon.domain.status.dto.StatusItem;
 import de.magicline.racoon.domain.status.dto.StatusMessage;
 import de.magicline.racoon.domain.task.dto.RowValue;
+import de.magicline.racoon.domain.task.dto.Task;
+import de.magicline.racoon.domain.task.persistance.TaskRepository;
 import feign.Request;
 import feign.Response;
 
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,24 +42,33 @@ import static org.mockito.BDDMockito.given;
 @SpringBootTest
 class TaskCallbacksServiceIT {
 
-    private static final String TASK_ID = "some task id";
+    private String taskId;
     private static final RTEVValidationStatus STATUS = RTEVValidationStatus.OK_VALID_ADDRESS;
     private static final String STATUS_VALID_QUEUE = "ml.racoon.status.valid";
 
     @Autowired
     private TaskCallbacksService testee;
+    @Autowired
+    private TaskRepository taskRepository;
     @MockBean
     private RTEVValidationClient validationClient;
     @Autowired
     private TaskListener taskListener;
     private AtomicReference<StatusMessage> receivedStatusMessage = new AtomicReference<>();
 
+    @BeforeEach
+    void setUp() {
+        taskId = UUID.randomUUID().toString();
+        taskRepository.insert(
+                new Task(taskId, getClass().getSimpleName(), Instant.EPOCH));
+    }
+
     @Test
     void shouldPublishStatusMessageWhenTaskCompleted() throws IOException {
         RTEVRowValue row = new RTEVRowValue("email", STATUS.getCode(), "message");
         given(validationClient.downloadTaskResult(
                 any(URI.class),
-                eq(TASK_ID),
+                eq(taskId),
                 eq("download"),
                 eq("valid-nocatchall"),
                 eq("catchall"),
@@ -64,7 +78,7 @@ class TaskCallbacksServiceIT {
                 eq("long"))
         ).willReturn(toResponse(toCsv(RowValue.class, row)));
 
-        testee.complete(TASK_ID);
+        testee.complete(taskId);
 
         await().atMost(2, TimeUnit.SECONDS).untilAtomic(receivedStatusMessage, notNullValue());
         assertThat(receivedStatusMessage.get().getItems())
@@ -79,7 +93,7 @@ class TaskCallbacksServiceIT {
                 .containsExactly(
                         STATUS.getCode(),
                         STATUS.getType(),
-                        TASK_ID,
+                        taskId,
                         1);
     }
 

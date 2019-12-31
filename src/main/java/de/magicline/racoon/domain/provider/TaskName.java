@@ -2,6 +2,7 @@ package de.magicline.racoon.domain.provider;
 
 import de.magicline.racoon.api.dto.ValidateEmailsRequest;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -15,11 +16,15 @@ class TaskName {
         this.size = request.getEmails().size();
     }
 
-    String generateName() {
-        return String.join(":", tenant, String.valueOf(size), getNow());
+    String generate(Clock clock) {
+        return String.join(":",
+                tenant,
+                String.valueOf(size),
+                format(LocalDateTime.now(clock)));
     }
 
-    private String getNow() {
-        return LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    private String format(LocalDateTime dateTime) {
+        return DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(dateTime);
     }
+
 }
