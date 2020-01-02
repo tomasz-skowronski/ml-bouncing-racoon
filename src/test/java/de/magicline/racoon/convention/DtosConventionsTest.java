@@ -3,6 +3,7 @@ package de.magicline.racoon.convention;
 import io.vavr.control.Try;
 
 import java.beans.ConstructorProperties;
+import java.lang.reflect.Modifier;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,13 +44,20 @@ class DtosConventionsTest {
         return new ArchCondition<>("have correct fields") {
             @Override
             public void check(JavaConstructor item, ConditionEvents events) {
-                Set<String> fields = item.getOwner().getAllFields().stream()
+                Set<String> fieldsNames = item.getOwner().getAllFields().stream()
                         .map(JavaMember::getName)
                         .collect(Collectors.toSet());
                 String[] annotationParams = item.getAnnotationOfType(ConstructorProperties.class).value();
                 addEvent(item, events, Try.run(() ->
-                        assertThat(annotationParams).containsExactlyInAnyOrderElementsOf(fields)));
+                        assertThat(annotationParams).as("@ConstructorProperties names").containsExactlyInAnyOrderElementsOf(fieldsNames)));
+                Set<String> fieldsNamesFinalOnly = item.getOwner().getAllFields().stream()
+                        .filter(field -> Modifier.isFinal(field.reflect().getModifiers()))
+                        .map(JavaMember::getName)
+                        .collect(Collectors.toSet());
+                addEvent(item, events, Try.run(() ->
+                        assertThat(fieldsNamesFinalOnly).as("final fields").containsExactlyInAnyOrderElementsOf(fieldsNames)));
             }
+
         };
     }
 
@@ -60,7 +68,7 @@ class DtosConventionsTest {
                 JavaClassList constructorParams = item.getRawParameterTypes();
                 String[] annotationParams = item.getAnnotationOfType(ConstructorProperties.class).value();
                 addEvent(item, events, Try.run(() ->
-                        assertThat(annotationParams).hasSize(constructorParams.size())));
+                        assertThat(annotationParams).as("@ConstructorProperties names").hasSize(constructorParams.size())));
             }
         };
     }

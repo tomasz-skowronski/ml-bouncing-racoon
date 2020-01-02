@@ -1,13 +1,16 @@
 package de.magicline.racoon.domain.task;
 
 import de.magicline.racoon.api.dto.ValidateEmailsRequest;
+import de.magicline.racoon.common.ProviderPropertiesBuilder;
 import de.magicline.racoon.common.TestClock;
 import de.magicline.racoon.config.ProviderConfiguration;
+import de.magicline.racoon.config.ProviderProperties;
 import de.magicline.racoon.domain.provider.DataValidator;
 import de.magicline.racoon.domain.provider.EmailValidationService;
 import de.magicline.racoon.domain.provider.RowsParser;
 import de.magicline.racoon.domain.provider.dto.RTEVAsyncResult;
 import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
+import de.magicline.racoon.domain.provider.dto.ValidationMode;
 import de.magicline.racoon.domain.status.dto.StatusItem;
 import de.magicline.racoon.domain.status.dto.StatusMessage;
 import de.magicline.racoon.domain.status.dto.ValidationStatusDto;
@@ -15,6 +18,7 @@ import de.magicline.racoon.domain.task.dto.Task;
 import de.magicline.racoon.domain.task.persistance.TaskRepository;
 import io.github.resilience4j.retry.RetryConfig;
 
+import java.net.URI;
 import java.time.Clock;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -52,19 +56,13 @@ class MockServiceIT {
 
     @BeforeEach
     void setUp() {
-        String uri = "http://localhost:" + port + "/racoon/mock";
-        String unused = "unused";
-        ProviderConfiguration providerConfiguration = new ProviderConfiguration(
-                uri,
-                uri,
-                uri,
-                unused,
-                unused,
-                unused,
-                1,
-                1);
+        URI uri = URI.create("http://localhost:" + port + "/racoon/mock");
+        ProviderProperties providerProperties = ProviderPropertiesBuilder.builder()
+                .withUri(new ProviderProperties.Uris(uri, uri, uri))
+                .build();
+        ProviderConfiguration providerConfiguration = new ProviderConfiguration(providerProperties);
         this.testee = new EmailValidationService(
-                providerConfiguration,
+                providerProperties,
                 providerConfiguration.rtevValidationClient(),
                 RetryConfig.ofDefaults(),
                 new RowsParser(),
@@ -77,7 +75,7 @@ class MockServiceIT {
     void validateUsingMockAndRetrieveStatusMessage() throws InterruptedException {
         ValidateEmailsRequest request = new ValidateEmailsRequest(
                 List.of("1@a.pl", "2@a.pl", "3@a.pl", "4@a.pl", "5@a.pl"),
-                "tenant");
+                "tenant", ValidationMode.EXPRESS);
         String taskId = "-392623883";
         count = new CountDownLatch(request.getEmails().size());
 

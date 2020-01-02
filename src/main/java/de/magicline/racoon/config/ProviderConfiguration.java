@@ -11,11 +11,9 @@ import feign.slf4j.Slf4jLogger;
 import io.github.resilience4j.retry.IntervalFunction;
 import io.github.resilience4j.retry.RetryConfig;
 
-import java.net.URI;
 import java.time.Duration;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -27,32 +25,10 @@ import org.springframework.web.server.ResponseStatusException;
 @Configuration
 public class ProviderConfiguration {
 
-    private final URI uriOne;
-    private final URI uriAsync;
-    private final URI uriDownload;
-    private String notifyURL;
-    private String notifyEmail;
-    private String apiKey;
-    private int retryMaxAttempts;
-    private long retryInitialIntervalSec;
+    private final ProviderProperties properties;
 
-    public ProviderConfiguration(
-            @Value("${app.rtev.uri.one}") String uriOne,
-            @Value("${app.rtev.uri.async}") String uriAsync,
-            @Value("${app.rtev.uri.download}") String uriDownload,
-            @Value("${app.rtev.notifyURL}") String notifyURL,
-            @Value("${app.rtev.notifyEmail}") String notifyEmail,
-            @Value("${app.rtev.apiKey}") String apiKey,
-            @Value("${app.rtev.retry.maxAttempts}") int retryMaxAttempts,
-            @Value("${app.rtev.retry.initialIntervalSec}") long retryInitialIntervalSec) {
-        this.uriOne = URI.create(uriOne);
-        this.uriAsync = URI.create(uriAsync);
-        this.uriDownload = URI.create(uriDownload);
-        this.notifyURL = notifyURL;
-        this.notifyEmail = notifyEmail;
-        this.apiKey = apiKey;
-        this.retryMaxAttempts = retryMaxAttempts;
-        this.retryInitialIntervalSec = retryInitialIntervalSec;
+    public ProviderConfiguration(ProviderProperties properties) {
+        this.properties = properties;
     }
 
     @Bean
@@ -77,9 +53,9 @@ public class ProviderConfiguration {
     @Bean
     public RetryConfig retryConfig() {
         return RetryConfig.custom()
-                .maxAttempts(retryMaxAttempts)
+                .maxAttempts(properties.getRetries().getMaxAttempts())
                 .intervalFunction(IntervalFunction.ofExponentialBackoff(
-                        Duration.ofSeconds(retryInitialIntervalSec)))
+                        Duration.ofSeconds(properties.getRetries().getInitialIntervalSec())))
                 .retryOnException(this::isRetryExpected)
                 .build();
     }
@@ -94,27 +70,4 @@ public class ProviderConfiguration {
         }
     }
 
-    public URI getUriOne() {
-        return uriOne;
-    }
-
-    public URI getUriAsync() {
-        return uriAsync;
-    }
-
-    public URI getUriDownload() {
-        return uriDownload;
-    }
-
-    public String getApiKey() {
-        return apiKey;
-    }
-
-    public String getNotifyURL() {
-        return notifyURL;
-    }
-
-    public String getNotifyEmail() {
-        return notifyEmail;
-    }
 }

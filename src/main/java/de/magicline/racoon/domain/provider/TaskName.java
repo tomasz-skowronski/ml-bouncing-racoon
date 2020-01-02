@@ -6,7 +6,7 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-class TaskName {
+final class TaskName {
 
     private final String tenant;
     private final int size;

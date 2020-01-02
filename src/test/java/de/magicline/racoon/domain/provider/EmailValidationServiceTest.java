@@ -2,17 +2,21 @@ package de.magicline.racoon.domain.provider;
 
 import de.magicline.racoon.api.dto.ValidateEmailRequest;
 import de.magicline.racoon.api.dto.ValidateEmailsRequest;
+import de.magicline.racoon.common.ProviderPropertiesBuilder;
 import de.magicline.racoon.common.TestClock;
 import de.magicline.racoon.config.ProviderConfiguration;
+import de.magicline.racoon.config.ProviderProperties;
 import de.magicline.racoon.domain.provider.dto.RTEVAsyncResult;
 import de.magicline.racoon.domain.provider.dto.RTEVResult;
 import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
+import de.magicline.racoon.domain.provider.dto.ValidationMode;
 import de.magicline.racoon.domain.provider.dto.ValidationResult;
 import de.magicline.racoon.domain.task.dto.Task;
 import de.magicline.racoon.domain.task.persistance.TaskRepository;
 import ru.lanwen.wiremock.ext.WiremockResolver;
 import ru.lanwen.wiremock.ext.WiremockUriResolver;
 
+import java.net.URI;
 import java.time.Clock;
 import java.util.List;
 
@@ -48,27 +52,23 @@ class EmailValidationServiceTest {
 
     private WireMockServer server;
     private EmailValidationService service;
-    private ProviderConfiguration providerConfiguration;
     @Mock
     private TaskRepository taskRepository;
     private Clock clock = new TestClock();
+    private ProviderProperties providerProperties;
 
     @BeforeEach
-    void setUp(@WiremockResolver.Wiremock WireMockServer server, @WiremockUriResolver.WiremockUri String mockUri) {
-        String apiKey = "ev-7791b803c271ab303acfa5029b1847e1";
-        String unused = "unused";
-        providerConfiguration = new ProviderConfiguration(
-                mockUri,
-                mockUri,
-                mockUri,
-                unused,
-                apiKey,
-                unused,
-                2,
-                1);
+    void setUp(@WiremockResolver.Wiremock WireMockServer server,
+               @WiremockUriResolver.WiremockUri String mockUri) {
+        URI uri = URI.create(mockUri);
+        providerProperties = ProviderPropertiesBuilder.builder()
+                .withUri(new ProviderProperties.Uris(uri, uri, uri))
+                .build();
+
+        ProviderConfiguration providerConfiguration = new ProviderConfiguration(providerProperties);
         RTEVValidationClient validationClient = providerConfiguration.rtevValidationClient();
         this.service = new EmailValidationService(
-                providerConfiguration,
+                providerProperties,
                 validationClient,
                 providerConfiguration.retryConfig(),
                 new RowsParser(),
@@ -115,7 +115,7 @@ class EmailValidationServiceTest {
 
         String taskId = "x5-2a6a7d199cc47698f6b8d1cc4995d71d";
         List<String> emails = List.of("a@a.pl", "info@magicline.de");
-        ValidateEmailsRequest request = new ValidateEmailsRequest(emails, "tenant");
+        ValidateEmailsRequest request = new ValidateEmailsRequest(emails, "tenant", ValidationMode.EXPRESS);
 
         @Test
         void success() throws JsonProcessingException {
@@ -129,7 +129,7 @@ class EmailValidationServiceTest {
             server.verify(postRequestedFor(urlPathEqualTo("/api/verify"))
                     .withHeader(CONTENT_TYPE, containing(MediaType.APPLICATION_FORM_URLENCODED_VALUE))
                     .withRequestBody(hasFormParam("EmailAddress", String.join("\n", emails)))
-                    .withRequestBody(hasFormParam("APIKey", providerConfiguration.getApiKey()))
+                    .withRequestBody(hasFormParam("APIKey", providerProperties.getApiKey()))
             );
             then(taskRepository).should().insert(any(Task.class));
         }

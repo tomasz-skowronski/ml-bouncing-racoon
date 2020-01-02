@@ -1,14 +1,18 @@
 package de.magicline.racoon;
 
+import de.magicline.racoon.config.ProviderProperties;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@EnableScheduling
 @SpringBootApplication
+@EnableScheduling
+@EnableConfigurationProperties(ProviderProperties.class)
 public class RacoonApplication {
 
     public static void main(String[] args) throws UnknownHostException {

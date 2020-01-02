@@ -50,16 +50,13 @@ Known issues:
 
 * `@MockBean`/`@TestConfiguration` doesn't work when run all tests. Workaround: `@DirtiesContext` for other IT.
 
-## Database (WIP)
+## Database
 
-Access to the DEV and Stage database is via the Jump Server:
+Access to the DEV database is via the Jump Server:
 
 `ssh ubuntu@jump.internal.magicline.com`
 
-| env   | pgpassword |
-|-------|:-------------:|
-| DEV   | `PGPASSWORD=igA6gAfQDzzTYZWmydkKptJy psql -h ml-db-bouncingracoon.cwwu8vfqevzy.eu-west-1.rds.amazonaws.com -U racoon_dev` |
-| STAGE | `PGPASSWORD=eVsxshroerc9UJVFAsfBCVDU psql -h ml-db-bouncingracoon.cwwu8vfqevzy.eu-west-1.rds.amazonaws.com -U racoon_stage` |
+`PGPASSWORD=igA6gAfQDzzTYZWmydkKptJy psql ml-db-bouncingracoon.cwwu8vfqevzy.eu-west-1.rds.amazonaws.com -U racoon_dev`
 
 ## Communication
 

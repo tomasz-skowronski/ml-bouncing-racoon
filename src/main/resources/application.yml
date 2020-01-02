@@ -36,17 +36,18 @@ spring:
     dynamic:      true
 
 app:
-  rtev:
-    uri:
-#      one: "http://localhost:8107/racoon/mock"
+  provider:
+    uris:
+#      sync: "http://localhost:8107/racoon/mock"
 #      async: "http://localhost:8107/racoon/mock"
-      one: "https://api.email-validator.net"
+      sync: "https://api.email-validator.net"
       async: "https://bulk.email-validator.net"
-      download: "https://www.email-validator.net"
+      results: "https://www.email-validator.net"
     apiKey: "ev-7791b803c271ab303acfa5029b1847e1"
     notifyURL: http://localhost:8107/racoon/tasks/callbacks
     notifyEmail:
-    retry:
+    validationMode: EXPRESS
+    retries:
       maxAttempts: 3
       initialIntervalSec: 10
   task:
@@ -55,8 +56,8 @@ app:
 
   job.delay:
       # https://www.logicbig.com/how-to/code-snippets/jcode-java-8-date-time-api-duration-parse.html
-      metrics: "PT1H" # TIME 1 HOUR
-      cleanup: "P1D" # 1 DAY
+      metrics: "PT1H"
+      cleanup: "PT24H"
 
 logging:
   config:

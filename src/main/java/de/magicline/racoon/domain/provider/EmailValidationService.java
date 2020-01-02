@@ -2,7 +2,7 @@ package de.magicline.racoon.domain.provider;
 
 import de.magicline.racoon.api.dto.ValidateEmailRequest;
 import de.magicline.racoon.api.dto.ValidateEmailsRequest;
-import de.magicline.racoon.config.ProviderConfiguration;
+import de.magicline.racoon.config.ProviderProperties;
 import de.magicline.racoon.config.RacoonMetrics;
 import de.magicline.racoon.domain.provider.dto.RTEVAsyncResult;
 import de.magicline.racoon.domain.provider.dto.RTEVResult;
@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Clock;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class EmailValidationService {
 
-    private final ProviderConfiguration providerConfiguration;
+    private final ProviderProperties providerProperties;
     private final RTEVValidationClient validationClient;
     private final Retry retry;
     private final RowsParser rowsParser;
@@ -36,13 +37,14 @@ public class EmailValidationService {
     private final TaskRepository taskRepository;
     private final Clock clock;
 
-    public EmailValidationService(ProviderConfiguration providerConfiguration,
+    public EmailValidationService(ProviderProperties providerProperties,
                                   RTEVValidationClient validationClient,
                                   RetryConfig retryConfig,
                                   RowsParser rowsParser,
                                   DataValidator dataValidator,
-                                  TaskRepository taskRepository, Clock clock) {
-        this.providerConfiguration = providerConfiguration;
+                                  TaskRepository taskRepository,
+                                  Clock clock) {
+        this.providerProperties = providerProperties;
         this.validationClient = validationClient;
         this.retry = Retry.of("rtev", retryConfig);
         this.rowsParser = rowsParser;
@@ -63,8 +65,8 @@ public class EmailValidationService {
 
     private RTEVResult callValidateEmail(ValidateEmailRequest request) {
         RTEVResult result = validationClient.validateEmail(
-                providerConfiguration.getUriOne(),
-                providerConfiguration.getApiKey(),
+                providerProperties.getUris().getSync(),
+                providerProperties.getApiKey(),
                 request.getEmail());
         RacoonMetrics.incrementValidationStatus(result.getStatus());
         return dataValidator.validateResponse(result);
@@ -74,15 +76,23 @@ public class EmailValidationService {
     public RTEVAsyncResult validateEmailsAsync(ValidateEmailsRequest request) {
         dataValidator.validateRequest(request);
         RTEVAsyncResult result = validationClient.validateEmailsAsync(
-                providerConfiguration.getUriAsync(),
-                providerConfiguration.getApiKey(),
+                providerProperties.getUris().getAsync(),
+                providerProperties.getApiKey(),
                 String.join("\n", request.getEmails()),
+                getValidationMode(request),
                 new TaskName(request).generate(clock),
-                providerConfiguration.getNotifyURL(),
-                providerConfiguration.getNotifyEmail());
+                providerProperties.getNotifyURL(),
+                providerProperties.getNotifyEmail());
         dataValidator.validateResponse(result);
         createTask(request, result);
         return result;
+    }
+
+    private String getValidationMode(ValidateEmailsRequest request) {
+        return Objects.requireNonNullElse(
+                request.getValidationMode(),
+                providerProperties.getValidationMode()
+        ).getValue();
     }
 
     private void createTask(ValidateEmailsRequest request, RTEVAsyncResult result) {
@@ -97,7 +107,7 @@ public class EmailValidationService {
     public ValidationResult downloadValidationResult(String taskId) {
         dataValidator.validateNotBlank(taskId);
         Response response = validationClient.downloadTaskResult(
-                providerConfiguration.getUriDownload(),
+                providerProperties.getUris().getResults(),
                 taskId,
                 "download",
                 "valid-nocatchall",

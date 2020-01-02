@@ -24,6 +24,7 @@ public interface RTEVValidationClient {
             URI uri,
             @Param("APIKey") String apiKey,
             @Param("EmailAddress") String emailAddresses,
+            @Param("ValidationMode") String validationMode,
             @Param("TaskName") String taskName,
             @Param("NotifyURL") String notifyURL,
             @Param("NotifyEmail") String notifyEmail);

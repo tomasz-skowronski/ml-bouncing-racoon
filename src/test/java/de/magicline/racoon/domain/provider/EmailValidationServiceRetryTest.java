@@ -1,8 +1,10 @@
 package de.magicline.racoon.domain.provider;
 
 import de.magicline.racoon.api.dto.ValidateEmailRequest;
+import de.magicline.racoon.common.ProviderPropertiesBuilder;
 import de.magicline.racoon.common.TestClock;
 import de.magicline.racoon.config.ProviderConfiguration;
+import de.magicline.racoon.config.ProviderProperties;
 import de.magicline.racoon.domain.provider.dto.RTEVResult;
 import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
 import de.magicline.racoon.domain.task.persistance.TaskRepository;
@@ -26,9 +28,13 @@ import static org.mockito.Mockito.times;
 class EmailValidationServiceRetryTest {
 
     private static final int MAX_ATTEMPTS = 2;
+    private static final int INITIAL_INTERVAL_SEC = 1;
+
     private EmailValidationService testee;
-    private ProviderConfiguration providerConfiguration = new ProviderConfiguration(
-            "", "", "", "", "", null, MAX_ATTEMPTS, 1);
+    private ProviderProperties providerProperties = ProviderPropertiesBuilder.builder()
+            .withRetry(new ProviderProperties.Retries(MAX_ATTEMPTS, INITIAL_INTERVAL_SEC))
+            .build();
+    private ProviderConfiguration providerConfiguration = new ProviderConfiguration(providerProperties);
     private DataValidator dataValidator = new DataValidator();
     @Mock
     private RTEVValidationClient validationClient;
@@ -40,7 +46,8 @@ class EmailValidationServiceRetryTest {
 
     @BeforeEach
     void setUp() {
-        testee = new EmailValidationService(providerConfiguration,
+        testee = new EmailValidationService(
+                providerProperties,
                 validationClient,
                 providerConfiguration.retryConfig(),
                 rowsParser,
