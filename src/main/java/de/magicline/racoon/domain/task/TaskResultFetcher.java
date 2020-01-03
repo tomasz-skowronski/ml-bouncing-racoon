@@ -1,7 +1,7 @@
 package de.magicline.racoon.domain.task;
 
 import de.magicline.racoon.config.RacoonMetrics;
-import de.magicline.racoon.domain.provider.EmailValidationService;
+import de.magicline.racoon.domain.provider.EmailValidator;
 import de.magicline.racoon.domain.provider.dto.ValidationResult;
 import de.magicline.racoon.domain.task.dto.Task;
 import de.magicline.racoon.domain.task.dto.TaskResult;
@@ -20,20 +20,20 @@ import org.springframework.web.server.ResponseStatusException;
 public class TaskResultFetcher {
 
     private final TaskRepository taskRepository;
-    private final EmailValidationService emailValidationService;
+    private final EmailValidator emailValidator;
     private final Clock clock;
 
     public TaskResultFetcher(TaskRepository taskRepository,
-                             EmailValidationService emailValidationService,
+                             EmailValidator emailValidator,
                              Clock clock) {
         this.taskRepository = taskRepository;
-        this.emailValidationService = emailValidationService;
+        this.emailValidator = emailValidator;
         this.clock = clock;
     }
 
     @Transactional
     public TaskResult fetchByTaskId(String taskId) {
-        ValidationResult validationResult = emailValidationService.downloadValidationResult(taskId);
+        ValidationResult validationResult = emailValidator.downloadValidationResult(taskId);
         Task task = updateModifiedDate(taskId);
         updateMetrics(task);
         return new TaskResult(

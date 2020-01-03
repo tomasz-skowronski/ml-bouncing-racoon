@@ -23,7 +23,7 @@ class ValidationListenerIT {
     @Autowired
     private RabbitTemplate rabbitTemplate;
     @MockBean
-    private EmailValidationService emailValidationService;
+    private EmailValidator emailValidationService;
     private final AtomicBoolean received = new AtomicBoolean();
 
     @Test

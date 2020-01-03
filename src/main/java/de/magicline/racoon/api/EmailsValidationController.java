@@ -4,7 +4,7 @@ import de.magicline.racoon.api.dto.ValidateEmailRequest;
 import de.magicline.racoon.api.dto.ValidateEmailResponse;
 import de.magicline.racoon.api.dto.ValidateEmailsRequest;
 import de.magicline.racoon.api.dto.ValidateEmailsResponse;
-import de.magicline.racoon.domain.provider.EmailValidationService;
+import de.magicline.racoon.domain.provider.EmailValidator;
 import de.magicline.racoon.domain.provider.dto.RTEVAsyncResult;
 import de.magicline.racoon.domain.provider.dto.RTEVResult;
 import javax.validation.Valid;
@@ -19,23 +19,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/racoon/validation")
 public class EmailsValidationController {
 
-    private final EmailValidationService emailValidationService;
+    private final EmailValidator emailValidator;
 
-    public EmailsValidationController(EmailValidationService emailValidationService) {
-        this.emailValidationService = emailValidationService;
+    public EmailsValidationController(EmailValidator emailValidator) {
+        this.emailValidator = emailValidator;
     }
 
     @PostMapping
     public ValidateEmailResponse validateEmail(
             @Valid @RequestBody ValidateEmailRequest request) {
-        RTEVResult result = emailValidationService.validateEmail(request);
+        RTEVResult result = emailValidator.validateEmail(request);
         return new ValidateEmailResponse(result);
     }
 
     @PostMapping("/async")
     public ResponseEntity<ValidateEmailsResponse> validateEmailsAsync(
             @Valid @RequestBody ValidateEmailsRequest request) {
-        RTEVAsyncResult result = emailValidationService.validateEmailsAsync(request);
+        RTEVAsyncResult result = emailValidator.validateEmailsAsync(request);
         return ResponseEntity.accepted()
                 .body(new ValidateEmailsResponse(result));
     }

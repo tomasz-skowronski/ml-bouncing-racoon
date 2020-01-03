@@ -18,7 +18,7 @@
 
 http://docs.aws.amazon.com/ses/latest/DeveloperGuide/best-practices-bounces-complaints.html
 
-[![context](doc/context.png)](doc/context.plantuml)
+[![overview](doc/overview.png)](doc/overview.plantuml)
 
 ## Local development
 
@@ -95,11 +95,12 @@ RTEV callbacks `GET /racoon/tasks/callbacks?taskid=<taskId>`
 * [STAGE](https://bouncing-racoon.stage.magicline.com/swagger-ui.html)
 * [PROD](https://bouncing-racoon.magicline.com/swagger-ui.html)
 
-### Mocks
+### Mocked Racoon
 
-[HTTP client in IDE](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html)
+You have 2 options:
 
-[mock.http](/src/test/http/mock.http)
+* call [mock controller](/src/test/http/mock.http) ([see HTTP client](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html))
+* run all application in the costless `mockmode` ([see `app.mockMode.enable`](src/main/resources/application.yml)) 
 
 ### Real-Time Email Validation API
 

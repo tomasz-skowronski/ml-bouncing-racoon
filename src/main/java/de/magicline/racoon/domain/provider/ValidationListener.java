@@ -15,16 +15,16 @@ public class ValidationListener {
 
     private static final Logger LOGGER = LogManager.getLogger(ValidationListener.class);
 
-    private final EmailValidationService emailValidationService;
+    private final EmailValidator emailValidator;
 
-    public ValidationListener(EmailValidationService emailValidationService) {
-        this.emailValidationService = emailValidationService;
+    public ValidationListener(EmailValidator emailValidator) {
+        this.emailValidator = emailValidator;
     }
 
     @RabbitListener(queues = RabbitConfiguration.VALIDATION_QUEUE)
     public void onValidateEmailsRequest(ValidateEmailsRequest request) {
         try {
-            RTEVAsyncResult result = emailValidationService.validateEmailsAsync(request);
+            RTEVAsyncResult result = emailValidator.validateEmailsAsync(request);
             LOGGER.info("onValidateEmailsRequest: {} , taskResult : {}", request, result);
         } catch (Exception e) {
             LOGGER.error("onValidateEmailsRequest FAILED: {}", request, e);

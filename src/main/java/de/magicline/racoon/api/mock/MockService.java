@@ -20,29 +20,37 @@ import org.springframework.stereotype.Service;
 @Service
 public class MockService {
 
+    private static final String INFO = "MOCK";
+
     private final StatusPublisher statusPublisher;
 
     public MockService(StatusPublisher statusPublisher) {
         this.statusPublisher = statusPublisher;
     }
 
+    RTEVAsyncResult validateAsExpected(List<String> emails, String tenant, RTEVValidationStatus expectedStatus) {
+        ValidationResult result = new ValidationResult(emails.stream()
+                .map(e -> new RTEVRowValue(e, expectedStatus.getCode(), INFO))
+                .collect(Collectors.toList()));
+        return answer(tenant, tenant, result);
+    }
+
     RTEVResult validate(String email) {
         return new RTEVResult(toStatus(email, 0));
     }
 
-    RTEVAsyncResult validate(List<String> emails, BigDecimal correct, String tenant) {
+    RTEVAsyncResult validate(List<String> emails, String tenant, BigDecimal correct) {
         AtomicInteger correctness = createCorrectnessCounter(emails, correct);
         String taskId = String.valueOf(emails.hashCode());
         ValidationResult result = new ValidationResult(toRows(emails, correctness));
-        statusPublisher.publishStatusMessages(new TaskResult(taskId, tenant, result));
-        return new RTEVAsyncResult(RTEVValidationStatus.TASK_ACCEPTED.getCode(), taskId);
+        return answer(tenant, taskId, result);
     }
 
     private List<RowValue> toRows(List<String> emails, AtomicInteger correctness) {
         return emails.stream()
                 .map(e -> {
                     int status = toStatus(e, correctness.getAndDecrement()).getCode();
-                    return new RTEVRowValue(e, status, "...");
+                    return new RTEVRowValue(e, status, INFO);
                 })
                 .collect(Collectors.toList());
     }
@@ -54,7 +62,7 @@ public class MockService {
         return new AtomicInteger(correctness.intValue());
     }
 
-    private RTEVValidationStatus toStatus(String email, Integer correctness) {
+    private RTEVValidationStatus toStatus(String email, int correctness) {
         if (correctness > 0) {
             return RTEVValidationStatus.OK_VALID_ADDRESS;
         } else {
@@ -62,5 +70,10 @@ public class MockService {
             int index = Math.abs(email.hashCode()) % values.length;
             return values[index];
         }
+    }
+
+    private RTEVAsyncResult answer(String tenant, String taskId, ValidationResult result) {
+        statusPublisher.publishStatusMessages(new TaskResult(taskId, tenant, result));
+        return new RTEVAsyncResult(RTEVValidationStatus.TASK_ACCEPTED.getCode(), taskId);
     }
 }

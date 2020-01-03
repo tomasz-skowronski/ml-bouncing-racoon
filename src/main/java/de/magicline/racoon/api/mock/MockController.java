@@ -62,7 +62,7 @@ public class MockController {
 
     private RTEVAsyncResult verifyAsync(Map<String, String> params, BigDecimal correct, String tenant) {
         List<String> emails = Arrays.asList(getEmails(params).split(DELIMITER));
-        return mockService.validate(emails, correct, tenant);
+        return mockService.validate(emails, tenant, correct);
     }
 
     private RTEVResult verifySync(@RequestParam Map<String, String> params) {

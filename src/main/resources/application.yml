@@ -53,7 +53,9 @@ app:
   task:
     status:
       batch: 100
-
+  mockMode:
+    enabled: false
+    expectedStatus: OK_VALID_ADDRESS
   job.delay:
       # https://www.logicbig.com/how-to/code-snippets/jcode-java-8-date-time-api-duration-parse.html
       metrics: "PT1H"

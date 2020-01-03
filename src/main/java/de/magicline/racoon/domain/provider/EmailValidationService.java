@@ -22,12 +22,10 @@ import java.util.List;
 import java.util.Objects;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-@Service
-public class EmailValidationService {
+public class EmailValidationService implements EmailValidator {
 
     private final ProviderProperties providerProperties;
     private final RTEVValidationClient validationClient;
@@ -58,6 +56,7 @@ public class EmailValidationService {
         retry.getEventPublisher().onEvent(RacoonMetrics::incrementValidationRetry);
     }
 
+    @Override
     public RTEVResult validateEmail(ValidateEmailRequest request) {
         dataValidator.validateRequest(request);
         return retry.executeSupplier(() -> callValidateEmail(request));
@@ -73,6 +72,7 @@ public class EmailValidationService {
     }
 
     @Transactional
+    @Override
     public RTEVAsyncResult validateEmailsAsync(ValidateEmailsRequest request) {
         dataValidator.validateRequest(request);
         RTEVAsyncResult result = validationClient.validateEmailsAsync(
@@ -104,6 +104,7 @@ public class EmailValidationService {
      * @param taskId an unique identifier
      * @return CSV from https://www.email-validator.net/download.html
      */
+    @Override
     public ValidationResult downloadValidationResult(String taskId) {
         dataValidator.validateNotBlank(taskId);
         Response response = validationClient.downloadTaskResult(
