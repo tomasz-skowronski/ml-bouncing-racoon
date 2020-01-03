@@ -62,3 +62,5 @@ app:
 logging:
   config:
     "classpath:log4j2.xml"
+  level:
+    de.magicline.racoon.domain.provider.RTEVValidationClient: ${logging.feign.level:DEBUG}

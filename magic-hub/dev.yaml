@@ -1,0 +1,49 @@
+---
+host: bouncing-racoon.dev.magicline.com
+image: 221489699002.dkr.ecr.eu-central-1.amazonaws.com/magicline/ml-bouncing-racoon
+memoryRequest: 450Mi
+memoryLimit: 900Mi
+servicePort: 8107
+replicas: 1
+healthcheck:
+  path: /ping
+sendConsoleLogsToGraylog: false
+env:
+- name: ML_APP_NAME
+  value: ml-bouncing-racoon-dev
+- name: GRAYLOG_HOST
+  value: graylog-input.logging
+- name: DB_HOST
+  value: ml-db-bouncingracoon.cwwu8vfqevzy.eu-west-1.rds.amazonaws.com
+- name: DB_PORT
+  value: 5432
+- name: DB_NAME
+  value: racoon_dev
+- name: DB_SSL
+  value: true
+- name: DB_USER
+  valueFromSecret:
+    name: database
+    key: user
+- name: DB_PASSWORD
+  valueFromSecret:
+    name: database
+    key: password
+- name: RABBITMQ_HOST
+  value: crisp-leopard.rmq.cloudamqp.com
+- name: RABBITMQ_VHOST
+  value: magicline-dev
+- name: RABBITMQ_USERNAME
+  valueFromSecret:
+     name: rabbitmq
+     key: username
+- name: RABBITMQ_PASSWORD
+  valueFromSecret:
+     name: rabbitmq
+     key: password
+- name: LOGGING_FEIGN_LEVEL
+  value: INFO
+- name: JOB_DELAY_METRICS
+  value: PT1H
+- name: JOB_DELAY_CLEANUP
+  value: PT24H
