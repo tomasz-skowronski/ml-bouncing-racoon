@@ -13,9 +13,10 @@ cloud "AWS SES" as SES
 actor "email-validator.net (RTEV)" as RTEV
 
 MLB -left-> SES
+MLB --> MQ
 MLB --> BR
 BR --> RTEV
-BR -left- DB
+BR -- DB
 RTEV --> API
 API -right-> MQ
 MQ --> BR

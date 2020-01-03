@@ -18,6 +18,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.google.common.base.Preconditions;
+
 @Component
 public class DataValidator {
 
@@ -39,12 +41,11 @@ public class DataValidator {
     }
 
     void validateRequest(ValidateEmailsRequest request) {
+        Preconditions.checkArgument(request.getTenant() != null, "no tenant");
+        Preconditions.checkArgument(request.getEmails() != null, "no emails");
         int size = request.getEmails().size();
-        if (size <= EMAILS_LIMIT) {
-            RacoonMetrics.incrementValidations(size);
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "max emails: " + EMAILS_LIMIT);
-        }
+        Preconditions.checkArgument(size <= EMAILS_LIMIT, "max emails: " + EMAILS_LIMIT);
+        RacoonMetrics.incrementValidations(size);
     }
 
     <T extends RTEVStatusAware> T validateResponse(T result) {

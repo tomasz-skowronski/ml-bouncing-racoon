@@ -16,7 +16,8 @@ domain .. [config]
 client -> [api]
 [api] -> [provider] : validate emails
 [provider] --> RTEV: use
-RTEV -> [task] : create|complete
+[provider] -> [task] : create
+RTEV -> [task] : complete
 [task] -> [status] : publish
 [status] -> client : notify
 

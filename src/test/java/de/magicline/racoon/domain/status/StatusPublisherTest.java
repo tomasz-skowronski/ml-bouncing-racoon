@@ -1,5 +1,6 @@
 package de.magicline.racoon.domain.status;
 
+import de.magicline.racoon.config.RabbitConfiguration;
 import de.magicline.racoon.domain.provider.dto.RTEVRowValue;
 import de.magicline.racoon.domain.provider.dto.RTEVValidationStatus;
 import de.magicline.racoon.domain.provider.dto.ValidationResult;
@@ -30,8 +31,8 @@ import static org.mockito.Mockito.times;
 class StatusPublisherTest {
 
     private static final int BATCH_SIZE = 2;
-    private static final String ROUTING_SUSPECT = "ml.racoon.status.suspect";
-    private static final String ROUTING_INVALID = "ml.racoon.status.invalid";
+    private static final String ROUTING_SUSPECT = "status.suspect";
+    private static final String ROUTING_INVALID = "status.invalid";
 
     private StatusPublisher testee;
     @Mock
@@ -58,7 +59,7 @@ class StatusPublisherTest {
         testee.publishStatusMessages(taskResult);
 
         then(rabbitTemplate).should()
-                .convertAndSend(eq(ROUTING_SUSPECT), any(StatusMessage.class));
+                .convertAndSend(eq(RabbitConfiguration.RACOON_EXCHANGE), eq(ROUTING_SUSPECT), any(StatusMessage.class));
     }
 
     @Test
@@ -71,9 +72,9 @@ class StatusPublisherTest {
         testee.publishStatusMessages(taskResult);
 
         then(rabbitTemplate).should()
-                .convertAndSend(eq(ROUTING_SUSPECT), suspectCaptor.capture());
+                .convertAndSend(eq(RabbitConfiguration.RACOON_EXCHANGE), eq(ROUTING_SUSPECT), suspectCaptor.capture());
         then(rabbitTemplate).should()
-                .convertAndSend(eq(ROUTING_INVALID), invalidCaptor.capture());
+                .convertAndSend(eq(RabbitConfiguration.RACOON_EXCHANGE), eq(ROUTING_INVALID), invalidCaptor.capture());
         assertThat(suspectCaptor.getAllValues())
                 .extracting(
                         StatusMessage::getStatus,
@@ -102,7 +103,7 @@ class StatusPublisherTest {
         testee.publishStatusMessages(taskResult);
 
         then(rabbitTemplate).should(times(2))
-                .convertAndSend(eq(ROUTING_SUSPECT), suspectCaptor.capture());
+                .convertAndSend(eq(RabbitConfiguration.RACOON_EXCHANGE), eq(ROUTING_SUSPECT), suspectCaptor.capture());
         assertThat(suspectCaptor.getAllValues())
                 .extracting(StatusMessage::getItems)
                 .containsExactly(

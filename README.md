@@ -48,7 +48,9 @@ Alternatively you can use the following command to run all containers:
 
 Known issues: 
 
-* `@MockBean`/`@TestConfiguration` doesn't work when run all tests. Workaround: `@DirtiesContext` for other IT.
+* `@MockBean`/`@TestConfiguration` doesn't work when all tests run. Workaround: `@DirtiesContext` for other IT.
+* Integration Tests require running DB and MQ (see Docker containers). 
+* Integration Tests require not running application (MQ listeners race). 
 
 ## Database
 
@@ -62,10 +64,27 @@ Access to the DEV database is via the Jump Server:
 
 ### RabbitMQ
 
-[management console](http://localhost:15672)
+Exchange: **ml.racoon**, Bindings:
 
-[Docker](/docker/docker-compose.yaml)
+|Role    |To queue                         |Routing key
+|---|---|---	
+|in      |ml.racoon.validation             |validation	
+|internal|ml.racoon.task                   |task
+|out     |ml.racoon.status.indeterminate   |status.indeterminate	
+|out     |ml.racoon.status.invalid         |status.invalid	
+|out     |ml.racoon.status.suspect         |status.suspect	
+|out     |ml.racoon.status.valid           |status.valid
 
+Exchange: **ml.racoon.dlx**, Bindings:
+
+|To queue                  |Routing key
+|---|---	
+|ml.racoon.validation.dlq  |validation	
+|ml.racoon.task.dlq        |task
+
+See also [Web Console](http://localhost:15672)
+
+See also [Docker](/docker/docker-compose.yaml)
 ### External communication
 
 RTEV callbacks `GET /racoon/tasks/callbacks?taskid=<taskId>`

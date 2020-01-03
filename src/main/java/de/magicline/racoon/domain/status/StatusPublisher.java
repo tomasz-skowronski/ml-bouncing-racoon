@@ -59,7 +59,8 @@ public class StatusPublisher {
         RTEVValidationStatus.Type type = RTEVValidationStatus.Type.valueOf(status.getType());
         LOGGER.info("publish {}", statusMessage);
         rabbitTemplate.convertAndSend(
-                RabbitConfiguration.toStatusQueueName(type),
+                RabbitConfiguration.RACOON_EXCHANGE,
+                RabbitConfiguration.toRoutingKey(type),
                 statusMessage);
     }
 

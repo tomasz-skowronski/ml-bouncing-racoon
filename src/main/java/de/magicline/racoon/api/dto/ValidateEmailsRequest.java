@@ -5,6 +5,9 @@ import javax.validation.constraints.NotNull;
 
 import java.beans.ConstructorProperties;
 import java.util.List;
+import java.util.Objects;
+
+import com.google.common.base.MoreObjects;
 
 public class ValidateEmailsRequest {
 
@@ -31,5 +34,29 @@ public class ValidateEmailsRequest {
 
     public ValidationMode getValidationMode() {
         return validationMode;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("emails", emails != null ? emails.size() : null)
+                .add("tenant", tenant)
+                .add("validationMode", validationMode)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ValidateEmailsRequest that = (ValidateEmailsRequest) o;
+        return emails.equals(that.emails) &&
+                tenant.equals(that.tenant) &&
+                validationMode == that.validationMode;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(emails, tenant, validationMode);
     }
 }

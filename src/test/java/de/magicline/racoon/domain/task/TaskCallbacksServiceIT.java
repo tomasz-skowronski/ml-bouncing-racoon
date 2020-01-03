@@ -30,6 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static de.magicline.racoon.common.SerializationHelper.toCsv;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,6 +40,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
+@DirtiesContext
 @SpringBootTest
 class TaskCallbacksServiceIT {
 
