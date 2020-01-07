@@ -20,7 +20,7 @@ env:
 - name: DB_PORT
   value: 5432
 - name: DB_NAME
-  value: racoon_dev
+  value: racoon
 - name: DB_SSL
   value: true
 - name: DB_USER
