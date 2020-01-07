@@ -45,7 +45,7 @@ env:
      key: password
 - name: LOGGING_FEIGN_LEVEL
   value: INFO
-- name: PROVIDER_API_TOKEN
+- name: APP_PROVIDER_APIKEY
   valueFromSecret:
     name: provider
     key: token
