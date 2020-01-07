@@ -79,8 +79,8 @@ Exchange: **ml.racoon.dlx**, Bindings:
 
 |To queue                  |Routing key
 |---|---	
-|ml.racoon.validation.dlq  |validation	
-|ml.racoon.task.dlq        |task
+|ml.racoon.validation.dlx  |validation	
+|ml.racoon.task.dlx        |task
 
 See also [Web Console](http://localhost:15672)
 

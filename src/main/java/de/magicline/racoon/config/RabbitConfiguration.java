@@ -27,11 +27,9 @@ import static org.springframework.amqp.core.Binding.DestinationType.QUEUE;
 @EnableRabbit
 public class RabbitConfiguration {
 
-    // TODO update ml-external
     public static final String RACOON_EXCHANGE = "ml.racoon";
     private static final String X_DEAD_LETTER_EXCHANGE = "x-dead-letter-exchange";
     private static final String DLX = ".dlx";
-    private static final String DLQ = ".dlq";
 
     public static final String VALIDATION_ROUTING_KEY = "validation";
     public static final String VALIDATION_QUEUE = RACOON_EXCHANGE + "." + VALIDATION_ROUTING_KEY;
@@ -65,7 +63,7 @@ public class RabbitConfiguration {
     @Bean
     public Declarables declareValidationDeadLetter() {
         return createDeclarablesWithBinding(RACOON_EXCHANGE + DLX,
-                VALIDATION_QUEUE + DLQ,
+                VALIDATION_QUEUE + DLX,
                 Map.of(),
                 VALIDATION_ROUTING_KEY);
     }
@@ -81,7 +79,7 @@ public class RabbitConfiguration {
     @Bean
     public Declarables declareTaskDeadLetter() {
         return createDeclarablesWithBinding(RACOON_EXCHANGE + DLX,
-                TASK_QUEUE + DLQ,
+                TASK_QUEUE + DLX,
                 Map.of(),
                 TASK_ROUTING_KEY);
     }

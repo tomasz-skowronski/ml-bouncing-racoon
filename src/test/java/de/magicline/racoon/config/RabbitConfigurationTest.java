@@ -26,11 +26,29 @@ class RabbitConfigurationTest {
     }
 
     @Test
+    void declareValidationDeadLetter() {
+        Collection<Declarable> result = testee.declareValidationDeadLetter().getDeclarables();
+
+        containsExchanges(result, "ml.racoon.dlx");
+        containsQueues(result, "ml.racoon.validation.dlx");
+        containsRoutingKeys(result, "validation");
+    }
+
+    @Test
     void declareTask() {
         Collection<Declarable> result = testee.declareTask().getDeclarables();
 
         containsExchanges(result, "ml.racoon");
         containsQueues(result, "ml.racoon.task");
+        containsRoutingKeys(result, "task");
+    }
+
+    @Test
+    void declareTaskDeadLetter() {
+        Collection<Declarable> result = testee.declareTaskDeadLetter().getDeclarables();
+
+        containsExchanges(result, "ml.racoon.dlx");
+        containsQueues(result, "ml.racoon.task.dlx");
         containsRoutingKeys(result, "task");
     }
 
