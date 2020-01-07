@@ -45,7 +45,7 @@ env:
      key: password
 - name: LOGGING_FEIGN_LEVEL
   value: INFO
-- name: JOB_DELAY_METRICS
-  value: PT1H
-- name: JOB_DELAY_CLEANUP
-  value: PT24H
+- name: PROVIDER_API_TOKEN
+  valueFromSecret:
+    name: provider
+    key: token

@@ -43,7 +43,7 @@ app:
       sync: "https://api.email-validator.net"
       async: "https://bulk.email-validator.net"
       results: "https://www.email-validator.net"
-    apiKey: "ev-7791b803c271ab303acfa5029b1847e1"
+    apiKey: ${provider.api.token:ev-7791b803c271ab303acfa5029b1847e1}
     notifyURL: http://localhost:8122/racoon/tasks/callbacks
     notifyEmail:
     validationMode: EXPRESS

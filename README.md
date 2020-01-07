@@ -58,7 +58,7 @@ Access to the DEV database is via the Jump Server:
 
 `ssh ubuntu@jump.internal.magicline.com`
 
-`PGPASSWORD=igA6gAfQDzzTYZWmydkKptJy psql ml-db-bouncingracoon.cwwu8vfqevzy.eu-west-1.rds.amazonaws.com -U racoon_dev`
+`PGPASSWORD=igA6gAfQDzzTYZWmydkKptJy psql ml-db-bouncingracoon.cwwu8vfqevzy.eu-west-1.rds.amazonaws.com -U racoon`
 
 ## Communication
 
