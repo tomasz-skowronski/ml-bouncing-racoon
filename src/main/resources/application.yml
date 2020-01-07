@@ -1,5 +1,5 @@
 server:
-  port: 8107
+  port: 8122
 
 management:
   metrics.export.prometheus.enabled: true
@@ -38,13 +38,13 @@ spring:
 app:
   provider:
     uris:
-#      sync: "http://localhost:8107/racoon/mock"
-#      async: "http://localhost:8107/racoon/mock"
+#      sync: "http://localhost:8122/racoon/mock"
+#      async: "http://localhost:8122/racoon/mock"
       sync: "https://api.email-validator.net"
       async: "https://bulk.email-validator.net"
       results: "https://www.email-validator.net"
     apiKey: "ev-7791b803c271ab303acfa5029b1847e1"
-    notifyURL: http://localhost:8107/racoon/tasks/callbacks
+    notifyURL: http://localhost:8122/racoon/tasks/callbacks
     notifyEmail:
     validationMode: EXPRESS
     retries:

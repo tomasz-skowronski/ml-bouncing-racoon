@@ -5,6 +5,6 @@ ADD run.sh run.sh
 RUN chmod +x run.sh
 
 USER ml
-EXPOSE 8107
+EXPOSE 8122
 
 CMD ["./run.sh"]

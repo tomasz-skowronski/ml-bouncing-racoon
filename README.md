@@ -90,7 +90,7 @@ See also [Docker](/docker/docker-compose.yaml)
 RTEV callbacks `GET /racoon/tasks/callbacks?taskid=<taskId>`
 
 ### Swagger (WIP)
-* [LOCAL](http://localhost:8107/swagger-ui.html)
+* [LOCAL](http://localhost:8122/swagger-ui.html)
 * [DEV](https://bouncing-racoon.dev.magicline.com/swagger-ui.html)
 * [STAGE](https://bouncing-racoon.stage.magicline.com/swagger-ui.html)
 * [PROD](https://bouncing-racoon.magicline.com/swagger-ui.html)
