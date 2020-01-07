@@ -7,6 +7,8 @@ servicePort: 8107
 replicas: 1
 healthcheck:
   path: /ping
+imagePullSecrets:
+  - name: docker-ecr-image-pull-secret
 sendConsoleLogsToGraylog: false
 env:
 - name: ML_APP_NAME
