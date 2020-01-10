@@ -1,6 +1,6 @@
 ---
 host: bouncing-racoon.dev.magicline.com
-image: 221489699002.dkr.ecr.eu-central-1.amazonaws.com/magicline/ml-bouncing-racoon
+image: docker.pkg.github.com/sportalliance/ml-bouncing-racoon/ml-bouncing-racoon
 memoryRequest: 450Mi
 memoryLimit: 900Mi
 servicePort: 8122
@@ -8,7 +8,7 @@ replicas: 1
 healthcheck:
   path: /ping
 imagePullSecrets:
-  - name: docker-ecr-image-pull-secret
+  - name: docker-github-image-pull-secret
 sendConsoleLogsToGraylog: false
 env:
 - name: ML_APP_NAME
