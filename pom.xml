@@ -18,7 +18,7 @@
         <dependency.version.swagger>2.9.2</dependency.version.swagger>
         <dependency.version.mockito>3.1.0</dependency.version.mockito>
         <dependency.version.junit>5.5.2</dependency.version.junit>
-        <dependency.version.assertj>3.13.2</dependency.version.assertj>
+        <dependency.version.assertj>3.14.0</dependency.version.assertj>
         <!-- override spring boot property for metrics version -->
         <dependency.version.prometheus.metrics>0.1.0</dependency.version.prometheus.metrics>
         <dependency.version.jdbi>3.12.0</dependency.version.jdbi>
