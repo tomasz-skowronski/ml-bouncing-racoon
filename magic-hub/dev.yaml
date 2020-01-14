@@ -1,7 +1,7 @@
 ---
 host: bouncing-racoon.dev.magicline.com
 image: docker.pkg.github.com/sportalliance/ml-bouncing-racoon/ml-bouncing-racoon
-memoryRequest: 450Mi
+memoryRequest: 900Mi
 memoryLimit: 900Mi
 servicePort: 8122
 replicas: 1
@@ -11,6 +11,8 @@ imagePullSecrets:
   - name: docker-github-image-pull-secret
 sendConsoleLogsToGraylog: false
 env:
+- name: SPRING_PROFILES_ACTIVE
+  value: dev
 - name: ML_APP_NAME
   value: ml-bouncing-racoon-dev
 - name: GRAYLOG_HOST

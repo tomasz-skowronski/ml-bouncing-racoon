@@ -293,48 +293,53 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${dependency.version.spring-boot}</version>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>1.8.0</version>
+                <configuration>
+                    <from>
+                        <image>docker.pkg.github.com/sportalliance/spa-docker-base-images/adoptopenjdk:jdk-11</image>
+                    </from>
+                    <to>
+                        <image>
+                            docker.pkg.github.com/sportalliance/ml-bouncing-racoon/ml-bouncing-racoon:${project.version}
+                        </image>
+                        <tags>
+                            <tag>latest</tag>
+                        </tags>
+                    </to>
+                    <container>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+                        <jvmFlags>
+                            <jvmFlag>-Dfile.encoding=UTF-8</jvmFlag>
+                            <jvmFlag>-XX:+UseG1GC</jvmFlag>
+                            <jvmFlag>-XX:InitialRAMPercentage=40</jvmFlag>
+                            <jvmFlag>-XX:MaxRAMPercentage=80</jvmFlag>
+                            <jvmFlag>-Dcom.sun.management.jmxremote</jvmFlag>
+                            <jvmFlag>-Dcom.sun.management.jmxremote.local.only=false</jvmFlag>
+                            <jvmFlag>-Dcom.sun.management.jmxremote.ssl=false</jvmFlag>
+                            <jvmFlag>-Dcom.sun.management.jmxremote.authenticate=true</jvmFlag>
+                            <jvmFlag>-Dcom.sun.management.jmxremote.password.file=./jmxremote.password</jvmFlag>
+                            <jvmFlag>-Dcom.sun.management.jmxremote.port=9010</jvmFlag>
+                            <jvmFlag>-Dcom.sun.management.jmxremote.rmi.port=9010</jvmFlag>
+                            <jvmFlag>-Djava.rmi.server.hostname=127.0.0.1</jvmFlag>
+                        </jvmFlags>
+                        <ports>
+                            <port>8122</port>
+                            <port>9010</port>
+                        </ports>
+                        <user>spa</user>
+                    </container>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>repackage</id>
+                        <phase>install</phase>
                         <goals>
-                            <goal>repackage</goal>
+                            <goal>build</goal>
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <mainClass>de.magicline.racoon.RacoonApplication</mainClass>
-                    <executable>true</executable>
-                    <!-- https://github.com/spring-projects/spring-boot/issues/6254#issuecomment-229600830 -->
-                    <classifier>exec</classifier>
-                </configuration>
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>unitTests</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                            <excludes>
-                                <exclude>**/*IT.java</exclude>
-                            </excludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
 </project>

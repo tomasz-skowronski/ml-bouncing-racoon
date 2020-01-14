@@ -21,7 +21,6 @@ services:
     environment:
         - MAVEN_USER=tc_magicline
         - MAVEN_PASSWORD=sSWqHT7nrBqscWtH
-        - ML_ENVIRONMENT=local
         - DB_HOST=postgres
         - DB_PORT=5432
         - DB_NAME=racoon
@@ -38,5 +37,6 @@ services:
     volumes:
         - "./../:/app"
         - "~/.m2/repository:/root/.m2/repository"
+        - "~/.docker:/root/.docker"
     working_dir: /app
-    command: ["mvn", "-e","-B", "clean", "install","-Dml.log.dir=/tmp" ]
+    command: ["mvn", "-e","-B", "clean", "verify","-Dml.log.dir=/tmp" ]
