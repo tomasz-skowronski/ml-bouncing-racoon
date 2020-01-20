@@ -53,3 +53,7 @@ env:
   valueFromSecret:
     name: provider
     key: token
+- name: APP_PROVIDER_NOTIFYURL
+  value: https://external.dev.magicline.com/webhooks/email/validation
+- name: APP_MOCKMODE_ENABLED
+  value: true
