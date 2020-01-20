@@ -7,6 +7,8 @@ servicePort: 8122
 replicas: 1
 healthcheck:
   path: /ping
+metrics:
+  path: /actuator/prometheus
 imagePullSecrets:
   - name: docker-github-image-pull-secret
 sendConsoleLogsToGraylog: false
