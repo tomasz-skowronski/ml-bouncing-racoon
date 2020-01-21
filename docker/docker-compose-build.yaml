@@ -3,15 +3,15 @@ version: "3"
 services:
   postgres:
     image: postgres:10.7-alpine
-    ports:
-      - "65432:5432"
+    expose:
+      - "5432"
     restart: always
     volumes:
           - "./init.sql:/docker-entrypoint-initdb.d/init.sql"
   rabbitmq:
     image: "rabbitmq:3.6.12"
-    ports:
-      - "5672:5672"
+    expose:
+      - "5672"
     environment:
       RABBITMQ_DEFAULT_USER: testuser
       RABBITMQ_DEFAULT_PASS: pass
