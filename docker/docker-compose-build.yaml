@@ -17,7 +17,7 @@ services:
       RABBITMQ_DEFAULT_PASS: pass
       RABBITMQ_DEFAULT_VHOST: /magicline
   maven:
-    image: docker.pkg.github.com/sportalliance/ml-maven-builder/ml-maven-builder:latest-jdk11
+    image: 221489699002.dkr.ecr.eu-central-1.amazonaws.com/sportalliance/maven-builder:jdk-11
     environment:
         - MAVEN_USER=tc_magicline
         - MAVEN_PASSWORD=sSWqHT7nrBqscWtH
